@@ -89,7 +89,7 @@
             100% { transform: translateX(50%); }
         }
 
-        /* Луна-полумесяц */
+        /* Луна-полумесяц с насыщенными цветами */
         .moon {
             position: absolute;
             width: 180px;
@@ -98,6 +98,7 @@
             right: 10%;
             animation: floatMoon 15s infinite alternate ease-in-out;
             z-index: 0;
+            filter: drop-shadow(0 0 15px rgba(255, 223, 0, 0.7));
         }
 
         .moon::before {
@@ -106,13 +107,13 @@
             width: 100%;
             height: 100%;
             background: radial-gradient(circle at 70% 30%, 
-                #e6e6fa 0%, 
-                #b0c4de 20%,
-                #778899 40%,
-                #483d8b 60%,
-                #2f2f4f 100%);
+                #ffeb3b 0%, 
+                #ffc107 20%,
+                #ff9800 40%,
+                #ff5722 60%,
+                #e91e63 100%);
             border-radius: 50%;
-            box-shadow: 0 0 40px rgba(230, 230, 250, 0.8),
+            box-shadow: 0 0 40px rgba(255, 235, 59, 0.8),
                         inset -20px -10px 30px rgba(0, 0, 0, 0.7);
             animation: moonGlow 8s infinite alternate;
         }
@@ -132,7 +133,7 @@
         /* Кратеры на луне */
         .moon-crater {
             position: absolute;
-            background: rgba(47, 47, 79, 0.7);
+            background: rgba(233, 30, 99, 0.7);
             border-radius: 50%;
             box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.5);
         }
@@ -173,10 +174,86 @@
         }
 
         @keyframes moonGlow {
-            0% { box-shadow: 0 0 40px rgba(230, 230, 250, 0.8),
+            0% { box-shadow: 0 0 40px rgba(255, 235, 59, 0.8),
                              inset -20px -10px 30px rgba(0, 0, 0, 0.7); }
-            100% { box-shadow: 0 0 50px rgba(230, 230, 250, 0.9),
+            100% { box-shadow: 0 0 50px rgba(255, 235, 59, 0.9),
                              inset -15px -5px 25px rgba(0, 0, 0, 0.6); }
+        }
+
+        /* Комета */
+        .comet {
+            position: absolute;
+            width: 150px;
+            height: 3px;
+            background: linear-gradient(to right, 
+                rgba(255, 255, 255, 0) 0%, 
+                rgba(255, 255, 255, 0.8) 30%,
+                rgba(100, 200, 255, 0.9) 50%,
+                rgba(255, 255, 255, 0.8) 70%,
+                rgba(255, 255, 255, 0) 100%);
+            transform: rotate(-45deg);
+            top: 15%;
+            right: 10%;
+            animation: cometFly 25s infinite linear;
+            z-index: 1;
+            filter: blur(1px);
+        }
+
+        .comet-tail {
+            position: absolute;
+            width: 300px;
+            height: 20px;
+            background: radial-gradient(ellipse at right, 
+                rgba(100, 200, 255, 0.7) 0%,
+                rgba(100, 200, 255, 0.4) 40%,
+                rgba(100, 200, 255, 0.2) 70%,
+                rgba(100, 200, 255, 0) 100%);
+            transform-origin: left center;
+            transform: rotate(-45deg) scaleY(0.5);
+            top: 15%;
+            right: 10%;
+            animation: cometTail 25s infinite linear;
+            z-index: 0;
+        }
+
+        @keyframes cometFly {
+            0% { 
+                top: 15%;
+                right: -150px;
+                opacity: 0;
+            }
+            1% {
+                opacity: 1;
+            }
+            20% {
+                top: 85%;
+                right: 100%;
+                opacity: 0;
+            }
+            100% {
+                opacity: 0;
+            }
+        }
+
+        @keyframes cometTail {
+            0% { 
+                top: 15%;
+                right: -300px;
+                opacity: 0;
+                width: 300px;
+            }
+            1% {
+                opacity: 0.7;
+            }
+            20% {
+                top: 85%;
+                right: 100%;
+                opacity: 0;
+                width: 100px;
+            }
+            100% {
+                opacity: 0;
+            }
         }
 
         /* Туманность */
@@ -255,7 +332,7 @@
             width: 100%;
         }
 
-        /* Расположение карт: первые три в первом ряду, последние две по центру во втором ряду */
+        /* Правильное расположение карт: первые три в первом ряду, последние две по центру во втором ряду */
         .card:nth-child(1) { grid-row: 1; grid-column: 1; }
         .card:nth-child(2) { grid-row: 1; grid-column: 2; }
         .card:nth-child(3) { grid-row: 1; grid-column: 3; }
@@ -263,16 +340,24 @@
         /* Центрируем две карты во втором ряду */
         .card:nth-child(4) { 
             grid-row: 2; 
-            grid-column: 2; 
+            grid-column: 1; 
             justify-self: end;
-            margin-right: -15%;
         }
         
         .card:nth-child(5) { 
             grid-row: 2; 
-            grid-column: 2; 
+            grid-column: 3; 
             justify-self: start;
-            margin-left: -15%;
+        }
+
+        /* Центральный контейнер для двух карт во втором ряду */
+        .second-row-center {
+            grid-row: 2;
+            grid-column: 2;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
         }
 
         .card {
@@ -366,12 +451,12 @@
             justify-content: center;
         }
 
-        /* Неоновое свечение для выбранной карты */
+        /* Уменьшенное неоновое свечение для выбранной карты */
         .card.flipped .card-front {
-            box-shadow: 0 0 15px 5px rgba(128, 0, 255, 0.7),
-                        0 0 25px 10px rgba(128, 0, 255, 0.5),
-                        0 0 35px 15px rgba(128, 0, 255, 0.3);
-            border: 2px solid rgba(200, 100, 255, 0.8);
+            box-shadow: 0 0 10px 3px rgba(128, 0, 255, 0.5),
+                        0 0 15px 5px rgba(128, 0, 255, 0.3),
+                        0 0 20px 7px rgba(128, 0, 255, 0.2);
+            border: 2px solid rgba(180, 70, 255, 0.6);
         }
 
         .card-name {
@@ -476,15 +561,6 @@
                 gap: 6px;
             }
             
-            /* Адаптивное центрирование для мобильных */
-            .card:nth-child(4) { 
-                margin-right: -10%;
-            }
-            
-            .card:nth-child(5) { 
-                margin-left: -10%;
-            }
-            
             .card-name {
                 font-size: 12px;
             }
@@ -521,19 +597,15 @@
             .aurora {
                 height: 30%;
             }
+
+            .comet, .comet-tail {
+                display: none; /* Скрываем комету на мобильных для производительности */
+            }
         }
 
         @media (max-width: 480px) {
             .cards-grid {
                 gap: 4px;
-            }
-            
-            .card:nth-child(4) { 
-                margin-right: -5%;
-            }
-            
-            .card:nth-child(5) { 
-                margin-left: -5%;
             }
             
             .card-name {
@@ -556,13 +628,17 @@
             <div class="moon-crater"></div>
             <div class="moon-crater"></div>
         </div>
+        <div class="comet"></div>
+        <div class="comet-tail"></div>
         <div class="nebula-large"></div>
     </div>
     
     <div class="container">
         <h1>Выберите 3 карты для расклада</h1>
         
-        <div class="cards-grid" id="cardsGrid"></div>
+        <div class="cards-grid" id="cardsGrid">
+            <!-- Карты будут добавлены через JavaScript -->
+        </div>
         
         <div class="selection-info">
             <div class="selected-count" id="selectedCount">Выбрано: 0/3 карт</div>
@@ -577,8 +653,8 @@
         function createSpaceBackground() {
             const spaceBg = document.getElementById('spaceBackground');
             
-            // Создаем звезды
-            for (let i = 0; i < 80; i++) {
+            // Создаем больше звезд
+            for (let i = 0; i < 150; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
                 star.style.width = Math.random() * 2 + 'px';
@@ -589,23 +665,34 @@
                 spaceBg.appendChild(star);
             }
             
-            // Создаем падающие звезды
-            setInterval(() => {
-                const shootingStar = document.createElement('div');
-                shootingStar.className = 'shooting-star';
-                shootingStar.style.left = Math.random() * 20 + '%';
-                shootingStar.style.top = Math.random() * 20 + '%';
-                shootingStar.style.width = 50 + Math.random() * 80 + 'px';
-                shootingStar.style.animationDelay = Math.random() * 2 + 's';
-                spaceBg.appendChild(shootingStar);
-                
-                // Удаляем через 10 секунд
+            // Создаем больше падающих звезд
+            for (let i = 0; i < 5; i++) {
                 setTimeout(() => {
-                    if (spaceBg.contains(shootingStar)) {
-                        spaceBg.removeChild(shootingStar);
-                    }
-                }, 10000);
-            }, 3000);
+                    createShootingStar();
+                }, i * 2000);
+            }
+            
+            // Создаем интервал для постоянного появления падающих звезд
+            setInterval(createShootingStar, 2000);
+        }
+
+        // Создание падающей звезды
+        function createShootingStar() {
+            const spaceBg = document.getElementById('spaceBackground');
+            const shootingStar = document.createElement('div');
+            shootingStar.className = 'shooting-star';
+            shootingStar.style.left = Math.random() * 20 + '%';
+            shootingStar.style.top = Math.random() * 20 + '%';
+            shootingStar.style.width = 50 + Math.random() * 100 + 'px';
+            shootingStar.style.animationDelay = Math.random() * 2 + 's';
+            spaceBg.appendChild(shootingStar);
+            
+            // Удаляем через 10 секунд
+            setTimeout(() => {
+                if (spaceBg.contains(shootingStar)) {
+                    spaceBg.removeChild(shootingStar);
+                }
+            }, 10000);
         }
 
         const tg = window.Telegram.WebApp;
@@ -639,7 +726,25 @@
         const selectedCardsContainer = document.getElementById('selectedCardsContainer');
         const confirmBtn = document.getElementById('confirmBtn');
         
-        selectedCards.forEach((cardName, index) => {
+        // Создаем первую строку с тремя картами
+        for (let i = 0; i < 3; i++) {
+            const cardElement = createCardElement(selectedCards[i]);
+            cardsGrid.appendChild(cardElement);
+        }
+        
+        // Создаем контейнер для второй строки с двумя картами
+        const secondRowContainer = document.createElement('div');
+        secondRowContainer.className = 'second-row-center';
+        
+        for (let i = 3; i < 5; i++) {
+            const cardElement = createCardElement(selectedCards[i]);
+            secondRowContainer.appendChild(cardElement);
+        }
+        
+        cardsGrid.appendChild(secondRowContainer);
+        
+        // Функция создания элемента карты
+        function createCardElement(cardName) {
             const cardElement = document.createElement('div');
             cardElement.className = 'card';
             cardElement.innerHTML = `
@@ -677,8 +782,8 @@
                 confirmBtn.disabled = userSelectedCards.length !== 3;
             });
             
-            cardsGrid.appendChild(cardElement);
-        });
+            return cardElement;
+        }
         
         // Функция обновления информации о выбранных картах
         function updateSelectionInfo() {

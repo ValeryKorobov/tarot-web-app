@@ -41,14 +41,63 @@
             overflow: hidden;
         }
 
+        /* Северное сияние */
+        .aurora {
+            position: absolute;
+            width: 100%;
+            height: 40%;
+            top: 0;
+            left: 0;
+            opacity: 0.6;
+            filter: blur(20px);
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .aurora::before, .aurora::after {
+            content: "";
+            position: absolute;
+            width: 150%;
+            height: 100%;
+            animation: auroraFlow 20s infinite linear;
+        }
+
+        .aurora::before {
+            background: linear-gradient(90deg, 
+                rgba(0, 255, 255, 0.2) 0%, 
+                rgba(0, 150, 255, 0.3) 25%, 
+                rgba(128, 0, 255, 0.4) 50%, 
+                rgba(255, 0, 150, 0.3) 75%, 
+                rgba(255, 100, 0, 0.2) 100%);
+            left: -25%;
+            animation-delay: -10s;
+        }
+
+        .aurora::after {
+            background: linear-gradient(90deg, 
+                rgba(255, 0, 150, 0.2) 0%, 
+                rgba(128, 0, 255, 0.3) 25%, 
+                rgba(0, 150, 255, 0.4) 50%, 
+                rgba(0, 255, 255, 0.3) 75%, 
+                rgba(0, 255, 0, 0.2) 100%);
+            left: -25%;
+            animation-delay: -5s;
+        }
+
+        @keyframes auroraFlow {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(50%); }
+        }
+
         /* Луна-полумесяц */
         .moon {
             position: absolute;
-            width: 150px;
-            height: 150px;
+            width: 180px;
+            height: 180px;
             top: 15%;
             right: 10%;
             animation: floatMoon 15s infinite alternate ease-in-out;
+            z-index: 0;
         }
 
         .moon::before {
@@ -56,25 +105,78 @@
             position: absolute;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at 30% 30%, #f1c40f, #f39c12, #e67e22);
+            background: radial-gradient(circle at 70% 30%, 
+                #e6e6fa 0%, 
+                #b0c4de 20%,
+                #778899 40%,
+                #483d8b 60%,
+                #2f2f4f 100%);
             border-radius: 50%;
-            box-shadow: 0 0 30px rgba(241, 196, 15, 0.7);
+            box-shadow: 0 0 40px rgba(230, 230, 250, 0.8),
+                        inset -20px -10px 30px rgba(0, 0, 0, 0.7);
+            animation: moonGlow 8s infinite alternate;
         }
 
         .moon::after {
             content: "";
             position: absolute;
-            width: 80%;
-            height: 80%;
+            width: 85%;
+            height: 85%;
             background: #0b0b2a;
             border-radius: 50%;
-            top: 10%;
-            right: -20%;
+            top: 7%;
+            right: -25%;
+            box-shadow: 5px 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Кратеры на луне */
+        .moon-crater {
+            position: absolute;
+            background: rgba(47, 47, 79, 0.7);
+            border-radius: 50%;
+            box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .moon-crater:nth-child(1) {
+            width: 25px;
+            height: 25px;
+            top: 30%;
+            left: 40%;
+        }
+
+        .moon-crater:nth-child(2) {
+            width: 15px;
+            height: 15px;
+            top: 50%;
+            left: 60%;
+        }
+
+        .moon-crater:nth-child(3) {
+            width: 20px;
+            height: 20px;
+            top: 65%;
+            left: 35%;
+        }
+
+        .moon-crater:nth-child(4) {
+            width: 12px;
+            height: 12px;
+            top: 25%;
+            left: 65%;
         }
 
         @keyframes floatMoon {
-            0% { transform: translateY(0) rotate(0deg); }
-            100% { transform: translateY(-15px) rotate(3deg); }
+            0% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(-5px, -8px) rotate(1deg); }
+            66% { transform: translate(3px, 5px) rotate(-1deg); }
+            100% { transform: translate(-2px, -3px) rotate(0.5deg); }
+        }
+
+        @keyframes moonGlow {
+            0% { box-shadow: 0 0 40px rgba(230, 230, 250, 0.8),
+                             inset -20px -10px 30px rgba(0, 0, 0, 0.7); }
+            100% { box-shadow: 0 0 50px rgba(230, 230, 250, 0.9),
+                             inset -15px -5px 25px rgba(0, 0, 0, 0.6); }
         }
 
         /* Туманность */
@@ -157,14 +259,27 @@
         .card:nth-child(1) { grid-row: 1; grid-column: 1; }
         .card:nth-child(2) { grid-row: 1; grid-column: 2; }
         .card:nth-child(3) { grid-row: 1; grid-column: 3; }
-        .card:nth-child(4) { grid-row: 2; grid-column: 2; } /* Центр второго ряда */
-        .card:nth-child(5) { grid-row: 2; grid-column: 3; } /* Справа от центра */
+        
+        /* Центрируем две карты во втором ряду */
+        .card:nth-child(4) { 
+            grid-row: 2; 
+            grid-column: 2; 
+            justify-self: end;
+            margin-right: -15%;
+        }
+        
+        .card:nth-child(5) { 
+            grid-row: 2; 
+            grid-column: 2; 
+            justify-self: start;
+            margin-left: -15%;
+        }
 
         .card {
             position: relative;
             width: 100%;
             height: 0;
-            padding-bottom: 143.29%; /* 470/328 = 1.4329 соотношение сторон карты */
+            padding-bottom: 143.29%;
             perspective: 1000px;
             cursor: pointer;
             animation: fadeIn 0.5s ease-in-out, floating 3s ease-in-out infinite;
@@ -236,7 +351,7 @@
         .card-back {
             background: url('card-back.png') center/contain no-repeat;
             border: 2px solid transparent;
-            transition: border 0.3s;
+            transition: all 0.3s;
         }
 
         .card-front {
@@ -249,6 +364,14 @@
             border: 2px solid rgba(128, 0, 255, 0.5);
             flex-direction: column;
             justify-content: center;
+        }
+
+        /* Неоновое свечение для выбранной карты */
+        .card.flipped .card-front {
+            box-shadow: 0 0 15px 5px rgba(128, 0, 255, 0.7),
+                        0 0 25px 10px rgba(128, 0, 255, 0.5),
+                        0 0 35px 15px rgba(128, 0, 255, 0.3);
+            border: 2px solid rgba(200, 100, 255, 0.8);
         }
 
         .card-name {
@@ -264,7 +387,7 @@
             align-items: center;
             justify-content: center;
             width: 100%;
-            min-height: 80px; /* Фиксированная высота для предотвращения скачков */
+            min-height: 80px;
         }
 
         .selected-count {
@@ -353,6 +476,15 @@
                 gap: 6px;
             }
             
+            /* Адаптивное центрирование для мобильных */
+            .card:nth-child(4) { 
+                margin-right: -10%;
+            }
+            
+            .card:nth-child(5) { 
+                margin-left: -10%;
+            }
+            
             .card-name {
                 font-size: 12px;
             }
@@ -373,8 +505,8 @@
             
             /* Луна и туманность для мобильных */
             .moon {
-                width: 100px;
-                height: 100px;
+                width: 120px;
+                height: 120px;
                 top: 10%;
                 right: 5%;
             }
@@ -385,11 +517,23 @@
                 bottom: 10%;
                 left: 5%;
             }
+            
+            .aurora {
+                height: 30%;
+            }
         }
 
         @media (max-width: 480px) {
             .cards-grid {
                 gap: 4px;
+            }
+            
+            .card:nth-child(4) { 
+                margin-right: -5%;
+            }
+            
+            .card:nth-child(5) { 
+                margin-left: -5%;
             }
             
             .card-name {
@@ -405,7 +549,13 @@
 </head>
 <body>
     <div class="space-background" id="spaceBackground">
-        <div class="moon"></div>
+        <div class="aurora"></div>
+        <div class="moon">
+            <div class="moon-crater"></div>
+            <div class="moon-crater"></div>
+            <div class="moon-crater"></div>
+            <div class="moon-crater"></div>
+        </div>
         <div class="nebula-large"></div>
     </div>
     

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Выбор карт Таро</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            color: white;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            position: relative;
+            width: 100%;
+            height: 150px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.8s;
+            transform-style: preserve-3d;
+        }
+        
+        .card.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+        
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        
+        .card-back {
+            background: url('card-back.jpg') center/cover;
+        }
+        
+        .card-front {
+            background: #fff;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: rotateY(180deg);
+            padding: 10px;
+            font-weight: bold;
+        }
+        
+        .selected-cards {
+            margin: 20px 0;
+            min-height: 60px;
+        }
+        
+        .confirm-btn {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .confirm-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Выберите 3 карты для расклада</h1>
+        
+        <div class="cards-grid" id="cardsGrid"></div>
+        
+        <div class="selected-cards" id="selectedCards">
+            <p>Выбрано: 0/3 карт</p>
+        </div>
+        
+        <button class="confirm-btn" id="confirmBtn" disabled>Подтвердить выбор</button>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        
+        // Список всех карт Таро
+        const allCards = [
+            "Шут", "Маг", "Верховная Жрица", "Императрица", "Император",
+            "Иерофант", "Влюбленные", "Колесница", "Сила", "Отшельник",
+            "Колесо Фортуны", "Правосудие", "Повешенный", "Смерть", "Умеренность",
+            "Дьявол", "Башня", "Звезда", "Луна", "Солнце", "Страшный суд", "Мир"
+        ];
+        
+        // Выбираем 5 случайных карт
+        const selectedCards = [];
+        const usedIndexes = new Set();
+        
+        while (selectedCards.length < 5) {
+            const randomIndex = Math.floor(Math.random() * allCards.length);
+            if (!usedIndexes.has(randomIndex)) {
+                selectedCards.push(allCards[randomIndex]);
+                usedIndexes.add(randomIndex);
+            }
+        }
+        
+        let userSelectedCards = [];
+        
+        // Создаем карты в интерфейсе
+        const cardsGrid = document.getElementById('cardsGrid');
+        const selectedInfo = document.getElementById('selectedCards');
+        const confirmBtn = document.getElementById('confirmBtn');
+        
+        selectedCards.forEach((cardName, index) => {
+            const cardElement = document.createElement('div');
+            cardElement.className = 'card';
+            cardElement.innerHTML = `
+                <div class="card-inner">
+                    <div class="card-back"></div>
+                    <div class="card-front">${cardName}</div>
+                </div>
+            `;
+            
+            cardElement.addEventListener('click', () => {
+                if (cardElement.classList.contains('flipped')) {
+                    // Убираем карту из выбранных
+                    userSelectedCards = userSelectedCards.filter(card => card !== cardName);
+                    cardElement.classList.remove('flipped');
+                } else if (userSelectedCards.length < 3) {
+                    // Добавляем карту в выбранные
+                    userSelectedCards.push(cardName);
+                    cardElement.classList.add('flipped');
+                }
+                
+                // Обновляем информацию
+                selectedInfo.innerHTML = `<p>Выбрано: ${userSelectedCards.length}/3 карт</p>`;
+                
+                // Активируем кнопку при выборе 3 карт
+                confirmBtn.disabled = userSelectedCards.length !== 3;
+            });
+            
+            cardsGrid.appendChild(cardElement);
+        });
+        
+        // Обработка подтверждения выбора
+        confirmBtn.addEventListener('click', () => {
+            // Отправляем выбранные карты обратно в бота
+            tg.sendData(JSON.stringify(userSelectedCards));
+            tg.close();
+        });
+    </script>
+</body>
+</html>

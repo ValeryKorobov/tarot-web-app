@@ -330,28 +330,18 @@
             margin-bottom: 20px;
             justify-items: center;
             width: 100%;
-            transition: all 0.5s ease;
         }
-
-        /* Расположение 6 карт: 3 в первом ряду, 3 во втором */
-        .card:nth-child(1) { grid-row: 1; grid-column: 1; }
-        .card:nth-child(2) { grid-row: 1; grid-column: 2; }
-        .card:nth-child(3) { grid-row: 1; grid-column: 3; }
-        .card:nth-child(4) { grid-row: 2; grid-column: 1; }
-        .card:nth-child(5) { grid-row: 2; grid-column: 2; }
-        .card:nth-child(6) { grid-row: 2; grid-column: 3; }
 
         .card {
             position: relative;
             width: 100%;
             height: 0;
-            padding-bottom: 143.29%; /* 470/328 = 1.4329 соотношение сторон карты */
+            padding-bottom: 143.29%;
             perspective: 1000px;
             cursor: pointer;
             animation: fadeIn 0.5s ease-in-out, floating 3s ease-in-out infinite;
             animation-fill-mode: both;
-            transform: translateZ(0); /* Аппаратное ускорение */
-            transition: all 0.5s ease;
+            transform: translateZ(0);
         }
 
         @keyframes floating {
@@ -387,7 +377,7 @@
             transform-style: preserve-3d;
             border-radius: 6px;
             will-change: transform;
-            transform: translateZ(0); /* Аппаратное ускорение */
+            transform: translateZ(0);
         }
 
         .card.flipped .card-inner {
@@ -416,7 +406,7 @@
             justify-content: center;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
             overflow: hidden;
-            transform: translateZ(0); /* Аппаратное ускорение */
+            transform: translateZ(0);
         }
 
         .card-back {
@@ -459,7 +449,6 @@
             justify-content: center;
             width: 100%;
             min-height: 80px;
-            transition: all 0.5s ease;
         }
 
         .selected-count {
@@ -503,14 +492,6 @@
             position: relative;
             overflow: hidden;
             margin-top: 15px;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.5s ease;
-        }
-
-        .confirm-btn.visible {
-            opacity: 1;
-            transform: translateY(0);
         }
 
         .confirm-btn:before {
@@ -541,81 +522,29 @@
             box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
         }
 
-        /* Стили для финального отображения выбранных карт */
-        .final-cards-container {
-            display: none;
-            flex-direction: row;
+        /* Стили для финального состояния */
+        .cards-grid.final-state {
+            display: flex;
             justify-content: center;
             align-items: center;
             gap: 15px;
-            width: 100%;
-            margin-top: 20px;
         }
 
-        .final-card {
+        .cards-grid.final-state .card {
             width: 30%;
-            height: 0;
-            padding-bottom: 42.98%; /* 470/328 * 30% */
-            perspective: 1000px;
-            transform: translateZ(0);
+            padding-bottom: 42.87%; /* 30% * 143.29% = 42.87% */
+            animation: none;
+            flex-shrink: 0;
         }
 
-        .final-card-inner {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            transform-style: preserve-3d;
-            border-radius: 8px;
-            transform: rotateY(180deg);
-            box-shadow: 0 0 15px 5px rgba(128, 0, 255, 0.5);
+        .cards-grid.final-state .card.flipped {
+            animation: finalScale 0.8s ease forwards;
         }
 
-        .final-card-front {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #1a1a40, #0b0b2a);
-            color: white;
-            padding: 8px;
-            font-weight: bold;
-            text-align: center;
-            border: 2px solid rgba(180, 70, 255, 0.6);
-            flex-direction: column;
+        @keyframes finalScale {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.2); }
         }
-
-        /* Анимация исчезновения невыбранных карт */
-        .card.fade-out {
-            opacity: 0;
-            transform: scale(0.8);
-            pointer-events: none;
-        }
-
-        /* Анимация появления финальных карт */
-        @keyframes finalCardAppear {
-            0% { 
-                opacity: 0;
-                transform: translateY(50px) scale(0.8);
-            }
-            100% { 
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        .final-card {
-            animation: finalCardAppear 0.8s ease forwards;
-        }
-
-        .final-card:nth-child(1) { animation-delay: 0.1s; }
-        .final-card:nth-child(2) { animation-delay: 0.3s; }
-        .final-card:nth-child(3) { animation-delay: 0.5s; }
 
         /* Для мобильных устройств */
         @media (max-width: 768px) {
@@ -673,14 +602,14 @@
                 display: none;
             }
 
-            .final-cards-container {
-                flex-direction: column;
-                gap: 20px;
+            /* Адаптация для финального состояния на мобильных */
+            .cards-grid.final-state {
+                gap: 10px;
             }
-
-            .final-card {
-                width: 80%;
-                padding-bottom: 114.63%; /* 470/328 * 80% */
+            
+            .cards-grid.final-state .card {
+                width: 28%;
+                padding-bottom: 40%;
             }
         }
 
@@ -696,6 +625,15 @@
             .selected-card-item {
                 font-size: 11px;
                 padding: 5px 8px;
+            }
+
+            .cards-grid.final-state {
+                gap: 8px;
+            }
+            
+            .cards-grid.final-state .card {
+                width: 26%;
+                padding-bottom: 37%;
             }
         }
     </style>
@@ -724,10 +662,6 @@
         <div class="selection-info">
             <div class="selected-count" id="selectedCount">Выбрано: 0/3 карт</div>
             <div class="selected-cards-container" id="selectedCardsContainer"></div>
-        </div>
-        
-        <div class="final-cards-container" id="finalCardsContainer">
-            <!-- Финальные карты будут добавлены через JavaScript -->
         </div>
         
         <button class="confirm-btn" id="confirmBtn" disabled>Подтвердить выбор</button>
@@ -802,25 +736,24 @@
         }
         
         let userSelectedCards = [];
+        let isFinalState = false;
         
         // Создаем карты в интерфейсе
         const cardsGrid = document.getElementById('cardsGrid');
         const selectedCount = document.getElementById('selectedCount');
         const selectedCardsContainer = document.getElementById('selectedCardsContainer');
         const confirmBtn = document.getElementById('confirmBtn');
-        const finalCardsContainer = document.getElementById('finalCardsContainer');
         
         // Создаем все 6 карт
         for (let i = 0; i < 6; i++) {
-            const cardElement = createCardElement(selectedCards[i], i);
+            const cardElement = createCardElement(selectedCards[i]);
             cardsGrid.appendChild(cardElement);
         }
         
         // Функция создания элемента карты
-        function createCardElement(cardName, index) {
+        function createCardElement(cardName) {
             const cardElement = document.createElement('div');
             cardElement.className = 'card';
-            cardElement.setAttribute('data-index', index);
             cardElement.innerHTML = `
                 <div class="card-inner">
                     <div class="card-back"></div>
@@ -833,6 +766,8 @@
             let isFlipped = false;
             
             cardElement.addEventListener('click', () => {
+                if (isFinalState) return;
+                
                 // Если карта уже перевернута, ничего не делаем
                 if (isFlipped) return;
                 
@@ -845,24 +780,52 @@
                 }
                 
                 // Добавляем карту в выбранные
-                userSelectedCards.push({
-                    name: cardName,
-                    element: cardElement,
-                    index: index
-                });
+                userSelectedCards.push(cardName);
                 cardElement.classList.add('flipped');
                 isFlipped = true;
                 
                 // Обновляем информацию
                 updateSelectionInfo();
                 
-                // Если выбрано 3 карты, запускаем анимацию
+                // Активируем кнопку при выборе 3 карт
+                confirmBtn.disabled = userSelectedCards.length !== 3;
+                
+                // Если выбрано 3 карты, запускаем анимацию завершения
                 if (userSelectedCards.length === 3) {
-                    setTimeout(showFinalCards, 500);
+                    animateSelectionCompletion();
                 }
             });
             
             return cardElement;
+        }
+        
+        // Функция анимации завершения выбора
+        function animateSelectionCompletion() {
+            isFinalState = true;
+            
+            // Находим все невыбранные карты
+            const notFlippedCards = document.querySelectorAll('.card:not(.flipped)');
+            
+            // Анимируем исчезновение невыбранных карт
+            notFlippedCards.forEach(card => {
+                card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                card.style.opacity = '0';
+                card.style.transform = 'scale(0.8)';
+            });
+            
+            // Через 500ms скрываем невыбранные карты и переходим к финальному состоянию
+            setTimeout(() => {
+                // Скрываем невыбранные карты
+                notFlippedCards.forEach(card => {
+                    card.style.display = 'none';
+                });
+                
+                // Добавляем класс финального состояния
+                cardsGrid.classList.add('final-state');
+                
+                // Обновляем текст кнопки
+                confirmBtn.textContent = 'Завершить выбор';
+            }, 500);
         }
         
         // Функция обновления информации о выбранных картах
@@ -876,48 +839,10 @@
                 userSelectedCards.forEach(card => {
                     const cardElement = document.createElement('div');
                     cardElement.className = 'selected-card-item';
-                    cardElement.textContent = card.name;
+                    cardElement.textContent = card;
                     selectedCardsContainer.appendChild(cardElement);
                 });
             }
-        }
-        
-        // Функция показа финальных карт
-        function showFinalCards() {
-            // Скрываем невыбранные карты
-            const allCards = document.querySelectorAll('.card');
-            allCards.forEach(card => {
-                const isSelected = userSelectedCards.some(selected => selected.element === card);
-                if (!isSelected) {
-                    card.classList.add('fade-out');
-                }
-            });
-            
-            // Скрываем информацию о выборе
-            document.querySelector('.selection-info').style.opacity = '0';
-            
-            // Создаем финальные карты
-            setTimeout(() => {
-                userSelectedCards.forEach((card, index) => {
-                    const finalCard = document.createElement('div');
-                    finalCard.className = 'final-card';
-                    finalCard.innerHTML = `
-                        <div class="final-card-inner">
-                            <div class="final-card-front">
-                                <div class="card-name">${card.name}</div>
-                            </div>
-                        </div>
-                    `;
-                    finalCardsContainer.appendChild(finalCard);
-                });
-                
-                // Показываем контейнер с финальными картами
-                finalCardsContainer.style.display = 'flex';
-                
-                // Показываем кнопку подтверждения
-                confirmBtn.classList.add('visible');
-                confirmBtn.disabled = false;
-            }, 500);
         }
         
         // Обработка подтверждения выбора
@@ -928,8 +853,7 @@
             }
             
             // Отправляем выбранные карты обратно в бота
-            const selectedCardNames = userSelectedCards.map(card => card.name);
-            tg.sendData(JSON.stringify(selectedCardNames));
+            tg.sendData(JSON.stringify(userSelectedCards));
             tg.close();
         });
 

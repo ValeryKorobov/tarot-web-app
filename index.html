@@ -36,7 +36,7 @@
         .card {
             position: relative;
             width: 100%;
-            height: 150px;
+            aspect-ratio: 3/4; /* Важное изменение - фиксированное соотношение */
             perspective: 1000px;
             cursor: pointer;
         }
@@ -60,6 +60,7 @@
             backface-visibility: hidden;
             border-radius: 10px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            object-fit: cover; /* Важное свойство для правильного масштабирования */
         }
         
         .card-back {

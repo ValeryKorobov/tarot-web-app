@@ -337,17 +337,19 @@
         .card:nth-child(2) { grid-row: 1; grid-column: 2; }
         .card:nth-child(3) { grid-row: 1; grid-column: 3; }
         
-        /* Центрируем две карты во втором ряду */
+        /* Центрируем две карты во втором ряду с отступами */
         .card:nth-child(4) { 
             grid-row: 2; 
-            grid-column: 1; 
+            grid-column: 2; 
             justify-self: end;
+            margin-right: 10px;
         }
         
         .card:nth-child(5) { 
             grid-row: 2; 
-            grid-column: 3; 
+            grid-column: 2; 
             justify-self: start;
+            margin-left: 10px;
         }
 
         .card {
@@ -359,6 +361,7 @@
             cursor: pointer;
             animation: fadeIn 0.5s ease-in-out, floating 3s ease-in-out infinite;
             animation-fill-mode: both;
+            transform: translateZ(0); /* Аппаратное ускорение */
         }
 
         @keyframes floating {
@@ -385,14 +388,15 @@
 
         .card-inner {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 3px; /* Уменьшаем рамку */
+            left: 3px; /* Уменьшаем рамку */
+            width: calc(100% - 6px); /* Уменьшаем рамку */
+            height: calc(100% - 6px); /* Уменьшаем рамку */
             transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             transform-style: preserve-3d;
-            border-radius: 8px;
+            border-radius: 6px; /* Закругляем углы */
             will-change: transform;
+            transform: translateZ(0); /* Аппаратное ускорение */
         }
 
         .card.flipped .card-inner {
@@ -415,12 +419,13 @@
             width: 100%;
             height: 100%;
             backface-visibility: hidden;
-            border-radius: 8px;
+            border-radius: 6px; /* Закругляем углы */
             display: flex;
             align-items: center;
             justify-content: center;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
             overflow: hidden;
+            transform: translateZ(0); /* Аппаратное ускорение */
         }
 
         .card-back {
@@ -551,6 +556,15 @@
                 gap: 6px;
             }
             
+            /* Адаптивное центрирование для мобильных */
+            .card:nth-child(4) { 
+                margin-right: 5px;
+            }
+            
+            .card:nth-child(5) { 
+                margin-left: 5px;
+            }
+            
             .card-name {
                 font-size: 12px;
             }
@@ -639,12 +653,16 @@
     </div>
 
     <script>
+        // Оптимизация: ограничиваем количество одновременно создаваемых элементов
+        let starsCreated = 0;
+        const maxStars = 80;
+        
         // Создаем космический фон
         function createSpaceBackground() {
             const spaceBg = document.getElementById('spaceBackground');
             
-            // Создаем больше звезд
-            for (let i = 0; i < 150; i++) {
+            // Создаем звезды (ограниченное количество)
+            for (let i = 0; i < maxStars && starsCreated < maxStars; i++) {
                 const star = document.createElement('div');
                 star.className = 'star';
                 star.style.width = Math.random() * 2 + 'px';
@@ -653,17 +671,11 @@
                 star.style.top = Math.random() * 100 + '%';
                 star.style.animationDelay = Math.random() * 5 + 's';
                 spaceBg.appendChild(star);
+                starsCreated++;
             }
             
-            // Создаем больше падающих звезд
-            for (let i = 0; i < 5; i++) {
-                setTimeout(() => {
-                    createShootingStar();
-                }, i * 2000);
-            }
-            
-            // Создаем интервал для постоянного появления падающих звезд
-            setInterval(createShootingStar, 2000);
+            // Создаем интервал для постоянного появления падающих звезд (реже)
+            setInterval(createShootingStar, 3000);
         }
 
         // Создание падающей звезды
@@ -673,7 +685,7 @@
             shootingStar.className = 'shooting-star';
             shootingStar.style.left = Math.random() * 20 + '%';
             shootingStar.style.top = Math.random() * 20 + '%';
-            shootingStar.style.width = 50 + Math.random() * 100 + 'px';
+            shootingStar.style.width = 50 + Math.random() * 80 + 'px';
             shootingStar.style.animationDelay = Math.random() * 2 + 's';
             spaceBg.appendChild(shootingStar);
             

@@ -325,31 +325,11 @@
         .cards-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: auto auto;
+            grid-template-rows: repeat(2, 1fr);
             gap: 8px;
             margin-bottom: 20px;
             justify-items: center;
             width: 100%;
-        }
-
-        /* Правильное расположение карт: первые три в первом ряду, последние две по центру во втором ряду */
-        .card:nth-child(1) { grid-row: 1; grid-column: 1; }
-        .card:nth-child(2) { grid-row: 1; grid-column: 2; }
-        .card:nth-child(3) { grid-row: 1; grid-column: 3; }
-        
-        /* Центрируем две карты во втором ряду с отступами */
-        .card:nth-child(4) { 
-            grid-row: 2; 
-            grid-column: 2; 
-            justify-self: end;
-            margin-right: 10px;
-        }
-        
-        .card:nth-child(5) { 
-            grid-row: 2; 
-            grid-column: 2; 
-            justify-self: start;
-            margin-left: 10px;
         }
 
         .card {
@@ -374,6 +354,7 @@
         .card:nth-child(3) { animation-delay: 0.3s, 0.4s; }
         .card:nth-child(4) { animation-delay: 0.4s, 0.6s; }
         .card:nth-child(5) { animation-delay: 0.5s, 0.8s; }
+        .card:nth-child(6) { animation-delay: 0.6s, 1.0s; }
 
         @keyframes fadeIn {
             from {
@@ -384,6 +365,48 @@
                 opacity: 1;
                 transform: translateY(0);
             }
+        }
+
+        /* Анимация улетания карты */
+        @keyframes flyAway {
+            0% {
+                opacity: 1;
+                transform: translate(0, 0) scale(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: translate(var(--fly-x, 100px), var(--fly-y, -100px)) scale(0.8) rotate(var(--fly-rotate, 15deg));
+            }
+            100% {
+                opacity: 0;
+                transform: translate(var(--fly-x, 200px), var(--fly-y, -200px)) scale(0.5) rotate(var(--fly-rotate, 30deg));
+            }
+        }
+
+        .card.fly-away {
+            animation: flyAway 1.5s forwards ease-in !important;
+            pointer-events: none;
+        }
+
+        /* Анимация пульсации для выбранных карт */
+        @keyframes selectedPulse {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 0 10px 3px rgba(128, 0, 255, 0.5),
+                            0 0 15px 5px rgba(128, 0, 255, 0.3),
+                            0 0 20px 7px rgba(128, 0, 255, 0.2);
+            }
+            50% { 
+                transform: scale(1.05);
+                box-shadow: 0 0 15px 5px rgba(128, 0, 255, 0.7),
+                            0 0 20px 8px rgba(128, 0, 255, 0.5),
+                            0 0 25px 10px rgba(128, 0, 255, 0.3);
+            }
+        }
+
+        .card.selected-highlight {
+            animation: selectedPulse 2s infinite ease-in-out !important;
+            z-index: 20;
         }
 
         .card-inner {
@@ -556,15 +579,6 @@
                 gap: 6px;
             }
             
-            /* Адаптивное центрирование для мобильных */
-            .card:nth-child(4) { 
-                margin-right: 5px;
-            }
-            
-            .card:nth-child(5) { 
-                margin-left: 5px;
-            }
-            
             .card-name {
                 font-size: 12px;
             }
@@ -708,11 +722,11 @@
             "Дьявол", "Башня", "Звезда", "Луна", "Солнце", "Страшный суд", "Мир"
         ];
         
-        // Выбираем 5 случайных карт
+        // Выбираем 6 случайных карт
         const selectedCards = [];
         const usedIndexes = new Set();
         
-        while (selectedCards.length < 5) {
+        while (selectedCards.length < 6) {
             const randomIndex = Math.floor(Math.random() * allCards.length);
             if (!usedIndexes.has(randomIndex)) {
                 selectedCards.push(allCards[randomIndex]);
@@ -721,6 +735,7 @@
         }
         
         let userSelectedCards = [];
+        let cardElements = [];
         
         // Создаем карты в интерфейсе
         const cardsGrid = document.getElementById('cardsGrid');
@@ -728,22 +743,18 @@
         const selectedCardsContainer = document.getElementById('selectedCardsContainer');
         const confirmBtn = document.getElementById('confirmBtn');
         
-        // Создаем первую строку с тремя картами
-        for (let i = 0; i < 3; i++) {
-            const cardElement = createCardElement(selectedCards[i]);
+        // Создаем все 6 карт
+        for (let i = 0; i < 6; i++) {
+            const cardElement = createCardElement(selectedCards[i], i);
             cardsGrid.appendChild(cardElement);
-        }
-        
-        // Создаем вторую строку с двумя картами
-        for (let i = 3; i < 5; i++) {
-            const cardElement = createCardElement(selectedCards[i]);
-            cardsGrid.appendChild(cardElement);
+            cardElements.push(cardElement);
         }
         
         // Функция создания элемента карты
-        function createCardElement(cardName) {
+        function createCardElement(cardName, index) {
             const cardElement = document.createElement('div');
             cardElement.className = 'card';
+            cardElement.setAttribute('data-card-name', cardName);
             cardElement.innerHTML = `
                 <div class="card-inner">
                     <div class="card-back"></div>
@@ -775,11 +786,57 @@
                 // Обновляем информацию
                 updateSelectionInfo();
                 
+                // Если выбрано 3 карты, запускаем анимацию
+                if (userSelectedCards.length === 3) {
+                    animateAfterSelection();
+                }
+                
                 // Активируем кнопку при выборе 3 карт
                 confirmBtn.disabled = userSelectedCards.length !== 3;
             });
             
             return cardElement;
+        }
+        
+        // Функция анимации после выбора 3 карт
+        function animateAfterSelection() {
+            // Находим все карты
+            const allCards = document.querySelectorAll('.card');
+            
+            // Определяем направления для улетания карт
+            const directions = [
+                { x: -200, y: -200, rotate: -30 }, // Верх-лево
+                { x: 0, y: -300, rotate: 0 },      // Вверх
+                { x: 200, y: -200, rotate: 30 },   // Верх-право
+                { x: -200, y: 200, rotate: -30 },  // Низ-лево
+                { x: 0, y: 300, rotate: 0 },       // Вниз
+                { x: 200, y: 200, rotate: 30 }     // Низ-право
+            ];
+            
+            // Анимируем каждую карту
+            allCards.forEach((card, index) => {
+                const cardName = card.getAttribute('data-card-name');
+                const isSelected = userSelectedCards.includes(cardName);
+                
+                if (isSelected) {
+                    // Подсвечиваем выбранные карты
+                    card.classList.add('selected-highlight');
+                } else {
+                    // Убираем возможность клика
+                    card.style.pointerEvents = 'none';
+                    
+                    // Устанавливаем случайное направление для улетания
+                    const direction = directions[index];
+                    card.style.setProperty('--fly-x', `${direction.x}px`);
+                    card.style.setProperty('--fly-y', `${direction.y}px`);
+                    card.style.setProperty('--fly-rotate', `${direction.rotate}deg`);
+                    
+                    // Запускаем анимацию улетания
+                    setTimeout(() => {
+                        card.classList.add('fly-away');
+                    }, 300 + index * 100); // Небольшая задержка между анимациями
+                }
+            });
         }
         
         // Функция обновления информации о выбранных картах

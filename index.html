@@ -180,82 +180,6 @@
                              inset -15px -5px 25px rgba(0, 0, 0, 0.6); }
         }
 
-        /* Комета */
-        .comet {
-            position: absolute;
-            width: 150px;
-            height: 3px;
-            background: linear-gradient(to right, 
-                rgba(255, 255, 255, 0) 0%, 
-                rgba(255, 255, 255, 0.8) 30%,
-                rgba(100, 200, 255, 0.9) 50%,
-                rgba(255, 255, 255, 0.8) 70%,
-                rgba(255, 255, 255, 0) 100%);
-            transform: rotate(-45deg);
-            top: 15%;
-            right: 10%;
-            animation: cometFly 25s infinite linear;
-            z-index: 1;
-            filter: blur(1px);
-        }
-
-        .comet-tail {
-            position: absolute;
-            width: 300px;
-            height: 20px;
-            background: radial-gradient(ellipse at right, 
-                rgba(100, 200, 255, 0.7) 0%,
-                rgba(100, 200, 255, 0.4) 40%,
-                rgba(100, 200, 255, 0.2) 70%,
-                rgba(100, 200, 255, 0) 100%);
-            transform-origin: left center;
-            transform: rotate(-45deg) scaleY(0.5);
-            top: 15%;
-            right: 10%;
-            animation: cometTail 25s infinite linear;
-            z-index: 0;
-        }
-
-        @keyframes cometFly {
-            0% { 
-                top: 15%;
-                right: -150px;
-                opacity: 0;
-            }
-            1% {
-                opacity: 1;
-            }
-            20% {
-                top: 85%;
-                right: 100%;
-                opacity: 0;
-            }
-            100% {
-                opacity: 0;
-            }
-        }
-
-        @keyframes cometTail {
-            0% { 
-                top: 15%;
-                right: -300px;
-                opacity: 0;
-                width: 300px;
-            }
-            1% {
-                opacity: 0.7;
-            }
-            20% {
-                top: 85%;
-                right: 100%;
-                opacity: 0;
-                width: 100px;
-            }
-            100% {
-                opacity: 0;
-            }
-        }
-
         /* Туманность */
         .nebula-large {
             position: absolute;
@@ -438,29 +362,15 @@
             padding: 0;
             border: 2px solid rgba(128, 0, 255, 0.5);
             flex-direction: column;
-            justify-content: flex-start;
+            justify-content: center;
             overflow: hidden;
         }
 
         .card-image {
             width: 100%;
-            height: 85%;
+            height: 100%;
             object-fit: cover;
-            border-radius: 4px 4px 0 0;
-        }
-
-        .card-name {
-            height: 15%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
-            color: white;
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
-            background: rgba(0, 0, 0, 0.6);
-            width: 100%;
-            padding: 4px;
+            border-radius: 4px;
         }
 
         /* Уменьшенное неоновое свечение для выбранной карты */
@@ -567,10 +477,6 @@
                 gap: 6px;
             }
             
-            .card-name {
-                font-size: 10px;
-            }
-            
             .selected-count {
                 font-size: 16px;
             }
@@ -603,20 +509,11 @@
             .aurora {
                 height: 30%;
             }
-
-            .comet, .comet-tail {
-                display: none; /* Скрываем комету на мобильных для производительности */
-            }
         }
 
         @media (max-width: 480px) {
             .cards-grid {
                 gap: 4px;
-            }
-            
-            .card-name {
-                font-size: 9px;
-                padding: 2px;
             }
             
             .selected-card-item {
@@ -635,8 +532,6 @@
             <div class="moon-crater"></div>
             <div class="moon-crater"></div>
         </div>
-        <div class="comet"></div>
-        <div class="comet-tail"></div>
         <div class="nebula-large"></div>
     </div>
     
@@ -703,30 +598,30 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
         
-        // Карты Таро с путями к изображениям
+        // Карты Таро с путями к изображениям (относительные пути)
         const tarotCards = [
-            { name: "Шут", image: "https://i.imgur.com/example1.jpg" },
-            { name: "Маг", image: "https://i.imgur.com/example2.jpg" },
-            { name: "Верховная Жрица", image: "https://i.imgur.com/example3.jpg" },
-            { name: "Императрица", image: "https://i.imgur.com/example4.jpg" },
-            { name: "Император", image: "https://i.imgur.com/example5.jpg" },
-            { name: "Иерофант", image: "https://i.imgur.com/example6.jpg" },
-            { name: "Влюбленные", image: "https://i.imgur.com/example7.jpg" },
-            { name: "Колесница", image: "https://i.imgur.com/example8.jpg" },
-            { name: "Сила", image: "https://i.imgur.com/example9.jpg" },
-            { name: "Отшельник", image: "https://i.imgur.com/example10.jpg" },
-            { name: "Колесо Фортуны", image: "https://i.imgur.com/example11.jpg" },
-            { name: "Правосудие", image: "https://i.imgur.com/example12.jpg" },
-            { name: "Повешенный", image: "https://i.imgur.com/example13.jpg" },
-            { name: "Смерть", image: "https://i.imgur.com/example14.jpg" },
-            { name: "Умеренность", image: "https://i.imgur.com/example15.jpg" },
-            { name: "Дьявол", image: "https://i.imgur.com/example16.jpg" },
-            { name: "Башня", image: "https://i.imgur.com/example17.jpg" },
-            { name: "Звезда", image: "https://i.imgur.com/example18.jpg" },
-            { name: "Луна", image: "https://i.imgur.com/example19.jpg" },
-            { name: "Солнце", image: "https://i.imgur.com/example20.jpg" },
-            { name: "Страшный суд", image: "https://i.imgur.com/example21.jpg" },
-            { name: "Мир", image: "https://i.imgur.com/example22.jpg" }
+            { name: "Шут", image: "fool.jpg" },
+            { name: "Маг", image: "magician.jpg" },
+            { name: "Верховная Жрица", image: "high_priestess.jpg" },
+            { name: "Императрица", image: "empress.jpg" },
+            { name: "Император", image: "emperor.jpg" },
+            { name: "Иерофант", image: "hierophant.jpg" },
+            { name: "Влюбленные", image: "lovers.jpg" },
+            { name: "Колесница", image: "chariot.jpg" },
+            { name: "Сила", image: "strength.jpg" },
+            { name: "Отшельник", image: "hermit.jpg" },
+            { name: "Колесо Фортуны", image: "wheel_of_fortune.jpg" },
+            { name: "Правосудие", image: "justice.jpg" },
+            { name: "Повешенный", image: "hanged_man.jpg" },
+            { name: "Смерть", image: "death.jpg" },
+            { name: "Умеренность", image: "temperance.jpg" },
+            { name: "Дьявол", image: "devil.jpg" },
+            { name: "Башня", image: "tower.jpg" },
+            { name: "Звезда", image: "star.jpg" },
+            { name: "Луна", image: "moon.jpg" },
+            { name: "Солнце", image: "sun.jpg" },
+            { name: "Страшный суд", image: "judgement.jpg" },
+            { name: "Мир", image: "world.jpg" }
         ];
         
         // Выбираем 6 случайных карт
@@ -766,7 +661,6 @@
                     <div class="card-back"></div>
                     <div class="card-front">
                         <img src="${cardData.image}" alt="${cardData.name}" class="card-image">
-                        <div class="card-name">${cardData.name}</div>
                     </div>
                 </div>
             `;

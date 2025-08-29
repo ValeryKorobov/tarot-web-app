@@ -308,7 +308,6 @@
             padding: 15px 5px;
             position: relative;
             z-index: 1;
-            transition: all 0.8s ease;
         }
 
         h1 {
@@ -331,7 +330,6 @@
             margin-bottom: 20px;
             justify-items: center;
             width: 100%;
-            transition: all 0.8s ease;
         }
 
         .card {
@@ -344,7 +342,6 @@
             animation: fadeIn 0.5s ease-in-out, floating 3s ease-in-out infinite;
             animation-fill-mode: both;
             transform: translateZ(0);
-            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         @keyframes floating {
@@ -452,7 +449,6 @@
             justify-content: center;
             width: 100%;
             min-height: 80px;
-            transition: all 0.8s ease;
         }
 
         .selected-count {
@@ -491,7 +487,7 @@
             border-radius: 25px;
             font-size: 16px;
             cursor: pointer;
-            transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.3s;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
             position: relative;
             overflow: hidden;
@@ -532,36 +528,22 @@
             justify-content: center;
             align-items: center;
             gap: 15px;
-            grid-template-columns: 1fr 1fr 1fr;
-            grid-template-rows: 1fr;
         }
 
         .cards-grid.final-state .card {
-            width: 100%;
-            padding-bottom: 143.29%;
+            width: 30%;
+            padding-bottom: 42.87%; /* 30% * 143.29% = 42.87% */
             animation: none;
             flex-shrink: 0;
-            transform: scale(1.2);
         }
 
-        .card.exit {
-            animation: cardExit 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        .cards-grid.final-state .card.flipped {
+            animation: finalScale 0.8s ease forwards;
         }
 
-        @keyframes cardExit {
-            0% {
-                opacity: 1;
-                transform: translateY(0) rotate(0deg) scale(1);
-            }
-            70% {
-                opacity: 0.7;
-                transform: translateY(-100px) rotate(-10deg) scale(0.8);
-            }
-            100% {
-                opacity: 0;
-                transform: translateY(-200px) rotate(-20deg) scale(0.5);
-                display: none;
-            }
+        @keyframes finalScale {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.2); }
         }
 
         /* Для мобильных устройств */
@@ -626,9 +608,8 @@
             }
             
             .cards-grid.final-state .card {
-                width: 100%;
-                padding-bottom: 143.29%;
-                transform: scale(1.15);
+                width: 28%;
+                padding-bottom: 40%;
             }
         }
 
@@ -651,9 +632,8 @@
             }
             
             .cards-grid.final-state .card {
-                width: 100%;
-                padding-bottom: 143.29%;
-                transform: scale(1.1);
+                width: 26%;
+                padding-bottom: 37%;
             }
         }
     </style>
@@ -828,10 +808,12 @@
             
             // Анимируем исчезновение невыбранных карт
             notFlippedCards.forEach(card => {
-                card.classList.add('exit');
+                card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                card.style.opacity = '0';
+                card.style.transform = 'scale(0.8)';
             });
             
-            // Через 500ms переходим к финальному состоянию
+            // Через 500ms скрываем невыбранные карты и переходим к финальному состоянию
             setTimeout(() => {
                 // Скрываем невыбранные карты
                 notFlippedCards.forEach(card => {
@@ -841,12 +823,9 @@
                 // Добавляем класс финального состояния
                 cardsGrid.classList.add('final-state');
                 
-                // Плавно перемещаем кнопку вниз
-                confirmBtn.style.marginTop = '30px';
-                
                 // Обновляем текст кнопки
                 confirmBtn.textContent = 'Завершить выбор';
-            }, 800);
+            }, 500);
         }
         
         // Функция обновления информации о выбранных картах

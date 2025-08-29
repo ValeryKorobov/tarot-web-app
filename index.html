@@ -308,6 +308,10 @@
             padding: 15px 5px;
             position: relative;
             z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.5s ease;
         }
 
         h1 {
@@ -315,6 +319,7 @@
             margin-bottom: 20px;
             text-shadow: 0 0 10px rgba(128, 0, 255, 0.7);
             animation: glow 2s infinite alternate;
+            transition: all 0.5s ease;
         }
 
         @keyframes glow {
@@ -330,6 +335,7 @@
             margin-bottom: 20px;
             justify-items: center;
             width: 100%;
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
         .card {
@@ -342,6 +348,7 @@
             animation: fadeIn 0.5s ease-in-out, floating 3s ease-in-out infinite;
             animation-fill-mode: both;
             transform: translateZ(0);
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
         @keyframes floating {
@@ -449,6 +456,7 @@
             justify-content: center;
             width: 100%;
             min-height: 80px;
+            transition: all 0.5s ease;
         }
 
         .selected-count {
@@ -522,28 +530,38 @@
             box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
         }
 
-        /* Стили для финального состояния */
+        /* Анимация исчезновения невыбранных карт */
+        @keyframes flyAway {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) rotate(-20deg);
+                opacity: 0;
+            }
+        }
+
+        .card.fly-away {
+            animation: flyAway 1s forwards ease-in-out;
+            pointer-events: none;
+        }
+
+        /* Финальное состояние для выбранных карт */
         .cards-grid.final-state {
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 15px;
+            margin-top: 20px;
         }
 
         .cards-grid.final-state .card {
             width: 30%;
-            padding-bottom: 42.87%; /* 30% * 143.29% = 42.87% */
+            padding-bottom: 42.87%;
             animation: none;
             flex-shrink: 0;
-        }
-
-        .cards-grid.final-state .card.flipped {
-            animation: finalScale 0.8s ease forwards;
-        }
-
-        @keyframes finalScale {
-            0% { transform: scale(1); }
-            100% { transform: scale(1.2); }
+            transform: scale(1.1);
         }
 
         /* Для мобильных устройств */
@@ -806,18 +824,21 @@
             // Находим все невыбранные карты
             const notFlippedCards = document.querySelectorAll('.card:not(.flipped)');
             
-            // Анимируем исчезновение невыбранных карт
-            notFlippedCards.forEach(card => {
-                card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-                card.style.opacity = '0';
-                card.style.transform = 'scale(0.8)';
+            // Анимируем уход невыбранных карт
+            notFlippedCards.forEach((card, index) => {
+                // Добавляем задержку для каждой карты
+                setTimeout(() => {
+                    card.classList.add('fly-away');
+                }, index * 200); // 200ms задержка между анимациями
             });
             
-            // Через 500ms скрываем невыбранные карты и переходим к финальному состоянию
+            // Через 1.5 секунды удаляем невыбранные карты и переходим к финальному состоянию
             setTimeout(() => {
-                // Скрываем невыбранные карты
+                // Удаляем невыбранные карты
                 notFlippedCards.forEach(card => {
-                    card.style.display = 'none';
+                    if (card.parentNode) {
+                        card.parentNode.removeChild(card);
+                    }
                 });
                 
                 // Добавляем класс финального состояния
@@ -825,7 +846,16 @@
                 
                 // Обновляем текст кнопки
                 confirmBtn.textContent = 'Завершить выбор';
-            }, 500);
+                
+                // Плавно перемещаем выбранные карты в ряд
+                const flippedCards = document.querySelectorAll('.card.flipped');
+                flippedCards.forEach((card, index) => {
+                    // Небольшая задержка для каждой карты для создания эффекта последовательности
+                    setTimeout(() => {
+                        card.style.transition = 'all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                    }, index * 100);
+                });
+            }, 1500);
         }
         
         // Функция обновления информации о выбранных картах

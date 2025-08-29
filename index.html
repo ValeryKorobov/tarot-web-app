@@ -6,6 +6,7 @@
     <title>Выбор карт Таро</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        /* Все предыдущие стили остаются без изменений */
         * {
             margin: 0;
             padding: 0;
@@ -442,6 +443,31 @@
             border: 2px solid rgba(180, 70, 255, 0.6);
         }
 
+        /* Новые стили для финального состояния выбранных карт */
+        .card.final-state {
+            animation: finalPulse 2s infinite ease-in-out !important;
+            transform: scale(1.1);
+            z-index: 20;
+        }
+
+        @keyframes finalPulse {
+            0%, 100% { 
+                transform: scale(1.1);
+                filter: brightness(1);
+            }
+            50% { 
+                transform: scale(1.15);
+                filter: brightness(1.3);
+            }
+        }
+
+        .card.final-state .card-front {
+            box-shadow: 0 0 15px 5px rgba(128, 0, 255, 0.7),
+                        0 0 25px 10px rgba(128, 0, 255, 0.5),
+                        0 0 35px 15px rgba(128, 0, 255, 0.3);
+            border: 2px solid rgba(200, 100, 255, 0.8);
+        }
+
         .card-name {
             font-size: 14px;
             margin-top: 8px;
@@ -547,23 +573,6 @@
             pointer-events: none;
         }
 
-        /* Финальное состояние для выбранных карт */
-        .cards-grid.final-state {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .cards-grid.final-state .card {
-            width: 30%;
-            padding-bottom: 42.87%;
-            animation: none;
-            flex-shrink: 0;
-            transform: scale(1.1);
-        }
-
         /* Для мобильных устройств */
         @media (max-width: 768px) {
             .container {
@@ -621,13 +630,19 @@
             }
 
             /* Адаптация для финального состояния на мобильных */
-            .cards-grid.final-state {
-                gap: 10px;
+            .card.final-state {
+                transform: scale(1.08);
             }
             
-            .cards-grid.final-state .card {
-                width: 28%;
-                padding-bottom: 40%;
+            @keyframes finalPulse {
+                0%, 100% { 
+                    transform: scale(1.08);
+                    filter: brightness(1);
+                }
+                50% { 
+                    transform: scale(1.12);
+                    filter: brightness(1.3);
+                }
             }
         }
 
@@ -645,13 +660,19 @@
                 padding: 5px 8px;
             }
 
-            .cards-grid.final-state {
-                gap: 8px;
+            .card.final-state {
+                transform: scale(1.05);
             }
             
-            .cards-grid.final-state .card {
-                width: 26%;
-                padding-bottom: 37%;
+            @keyframes finalPulse {
+                0%, 100% { 
+                    transform: scale(1.05);
+                    filter: brightness(1);
+                }
+                50% { 
+                    transform: scale(1.09);
+                    filter: brightness(1.3);
+                }
             }
         }
     </style>
@@ -832,7 +853,7 @@
                 }, index * 200); // 200ms задержка между анимациями
             });
             
-            // Через 1.5 секунды удаляем невыбранные карты и переходим к финальному состоянию
+            // Через 1.5 секунды удаляем невыбранные карты и применяем финальное состояние к выбранным
             setTimeout(() => {
                 // Удаляем невыбранные карты
                 notFlippedCards.forEach(card => {
@@ -841,18 +862,15 @@
                     }
                 });
                 
-                // Добавляем класс финального состояния
-                cardsGrid.classList.add('final-state');
-                
-                // Обновляем текст кнопки
-                confirmBtn.textContent = 'Завершить выбор';
-                
-                // Плавно перемещаем выбранные карты в ряд
+                // Применяем финальное состояние к выбранным картам
                 const flippedCards = document.querySelectorAll('.card.flipped');
                 flippedCards.forEach((card, index) => {
-                    // Небольшая задержка для каждой карты для создания эффекта последовательности
+                    // Убираем предыдущие анимации
+                    card.style.animation = 'none';
+                    
+                    // Добавляем задержку для каждой карты
                     setTimeout(() => {
-                        card.style.transition = 'all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+                        card.classList.add('final-state');
                     }, index * 100);
                 });
             }, 1500);

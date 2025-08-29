@@ -143,7 +143,7 @@
             animation: fadeIn 0.5s ease-in-out, floating 3s ease-in-out infinite;
             animation-fill-mode: both;
             transform: translateZ(0);
-            transition: transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transition: all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
         @keyframes floating {
@@ -251,6 +251,7 @@
             justify-content: center;
             width: 100%;
             min-height: 80px;
+            transition: all 0.8s ease;
         }
 
         .selected-count {
@@ -324,14 +325,17 @@
         }
 
         /* Анимация перемещения выбранных карт в ряд */
-        .card.move-to-position {
-            position: absolute;
-            top: 0;
-            left: 0;
+        .cards-grid.rearranging {
+            display: flex;
+            justify-content: space-between;
+            transition: all 1s ease;
+        }
+
+        .cards-grid.rearranging .card {
+            position: static;
             width: 30%;
             padding-bottom: 42.87%;
             transition: all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            z-index: 20;
         }
 
         /* Для мобильных устройств */
@@ -367,7 +371,7 @@
                 font-size: 14px;
             }
             
-            .card.move-to-position {
+            .cards-grid.rearranging .card {
                 width: 28%;
                 padding-bottom: 40%;
             }
@@ -387,7 +391,7 @@
                 padding: 5px 8px;
             }
 
-            .card.move-to-position {
+            .cards-grid.rearranging .card {
                 width: 26%;
                 padding-bottom: 37%;
             }
@@ -551,31 +555,10 @@
                     card.style.display = 'none';
                 });
                 
-                // Выстраиваем выбранные карты в ряд
-                arrangeCardsInRow();
+                // Меняем grid на flex для выстраивания в ряд
+                cardsGrid.classList.add('rearranging');
                 
             }, 1000);
-        }
-        
-        // Функция для выстраивания карт в ряд
-        function arrangeCardsInRow() {
-            const cardWidth = 30; // 30% ширины контейнера
-            const gap = (100 - (cardWidth * 3)) / 4; // Равномерное распределение
-            
-            userSelectedCards.forEach((card, index) => {
-                const cardElement = card.element;
-                
-                // Рассчитываем позицию для каждой карты
-                const position = gap + (index * (cardWidth + gap));
-                
-                // Добавляем класс для анимации
-                cardElement.classList.add('move-to-position');
-                
-                // Устанавливаем позицию
-                setTimeout(() => {
-                    cardElement.style.left = `${position}%`;
-                }, 50);
-            });
         }
         
         // Функция обновления информации о выбранных картах

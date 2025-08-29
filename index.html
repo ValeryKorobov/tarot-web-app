@@ -6,7 +6,6 @@
     <title>Выбор карт Таро</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        /* Все предыдущие стили остаются без изменений */
         * {
             margin: 0;
             padding: 0;
@@ -312,7 +311,6 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            transition: all 0.5s ease;
         }
 
         h1 {
@@ -320,7 +318,6 @@
             margin-bottom: 20px;
             text-shadow: 0 0 10px rgba(128, 0, 255, 0.7);
             animation: glow 2s infinite alternate;
-            transition: all 0.5s ease;
         }
 
         @keyframes glow {
@@ -336,7 +333,6 @@
             margin-bottom: 20px;
             justify-items: center;
             width: 100%;
-            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
         .card {
@@ -349,7 +345,7 @@
             animation: fadeIn 0.5s ease-in-out, floating 3s ease-in-out infinite;
             animation-fill-mode: both;
             transform: translateZ(0);
-            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transition: all 0.5s ease;
         }
 
         @keyframes floating {
@@ -443,31 +439,6 @@
             border: 2px solid rgba(180, 70, 255, 0.6);
         }
 
-        /* Новые стили для финального состояния выбранных карт */
-        .card.final-state {
-            animation: finalPulse 2s infinite ease-in-out !important;
-            transform: scale(1.1);
-            z-index: 20;
-        }
-
-        @keyframes finalPulse {
-            0%, 100% { 
-                transform: scale(1.1);
-                filter: brightness(1);
-            }
-            50% { 
-                transform: scale(1.15);
-                filter: brightness(1.3);
-            }
-        }
-
-        .card.final-state .card-front {
-            box-shadow: 0 0 15px 5px rgba(128, 0, 255, 0.7),
-                        0 0 25px 10px rgba(128, 0, 255, 0.5),
-                        0 0 35px 15px rgba(128, 0, 255, 0.3);
-            border: 2px solid rgba(200, 100, 255, 0.8);
-        }
-
         .card-name {
             font-size: 14px;
             margin-top: 8px;
@@ -482,7 +453,6 @@
             justify-content: center;
             width: 100%;
             min-height: 80px;
-            transition: all 0.5s ease;
         }
 
         .selected-count {
@@ -499,7 +469,6 @@
             gap: 8px;
             margin-top: 5px;
             width: 100%;
-            transition: opacity 0.3s ease;
         }
 
         .selected-card-item {
@@ -557,20 +526,39 @@
         }
 
         /* Анимация исчезновения невыбранных карт */
-        @keyframes flyAway {
+        @keyframes fadeOut {
             0% {
-                transform: translateY(0) rotate(0deg);
                 opacity: 1;
+                transform: scale(1);
             }
             100% {
-                transform: translateY(-100vh) rotate(-20deg);
                 opacity: 0;
+                transform: scale(0.8);
             }
         }
 
-        .card.fly-away {
-            animation: flyAway 1s forwards ease-in-out;
+        .card.fade-out {
+            animation: fadeOut 0.8s forwards ease-in-out;
             pointer-events: none;
+        }
+
+        /* Анимация пульсации для выбранных карт */
+        @keyframes selectedPulse {
+            0%, 100% { 
+                transform: scale(1.05);
+                box-shadow: 0 0 15px 5px rgba(128, 0, 255, 0.5),
+                            0 0 25px 10px rgba(128, 0, 255, 0.3);
+            }
+            50% { 
+                transform: scale(1.1);
+                box-shadow: 0 0 20px 8px rgba(128, 0, 255, 0.7),
+                            0 0 30px 15px rgba(128, 0, 255, 0.4);
+            }
+        }
+
+        .card.selected-highlight {
+            animation: selectedPulse 1.5s infinite ease-in-out;
+            z-index: 20;
         }
 
         /* Для мобильных устройств */
@@ -628,22 +616,6 @@
             .comet, .comet-tail {
                 display: none;
             }
-
-            /* Адаптация для финального состояния на мобильных */
-            .card.final-state {
-                transform: scale(1.08);
-            }
-            
-            @keyframes finalPulse {
-                0%, 100% { 
-                    transform: scale(1.08);
-                    filter: brightness(1);
-                }
-                50% { 
-                    transform: scale(1.12);
-                    filter: brightness(1.3);
-                }
-            }
         }
 
         @media (max-width: 480px) {
@@ -658,21 +630,6 @@
             .selected-card-item {
                 font-size: 11px;
                 padding: 5px 8px;
-            }
-
-            .card.final-state {
-                transform: scale(1.05);
-            }
-            
-            @keyframes finalPulse {
-                0%, 100% { 
-                    transform: scale(1.05);
-                    filter: brightness(1);
-                }
-                50% { 
-                    transform: scale(1.09);
-                    filter: brightness(1.3);
-                }
             }
         }
     </style>
@@ -845,33 +802,27 @@
             // Находим все невыбранные карты
             const notFlippedCards = document.querySelectorAll('.card:not(.flipped)');
             
-            // Анимируем уход невыбранных карт
+            // Анимируем исчезновение невыбранных карт
             notFlippedCards.forEach((card, index) => {
                 // Добавляем задержку для каждой карты
                 setTimeout(() => {
-                    card.classList.add('fly-away');
+                    card.classList.add('fade-out');
                 }, index * 200); // 200ms задержка между анимациями
             });
             
-            // Через 1.5 секунды удаляем невыбранные карты и применяем финальное состояние к выбранным
+            // Добавляем подсветку и пульсацию выбранным картам
+            const flippedCards = document.querySelectorAll('.card.flipped');
+            flippedCards.forEach((card, index) => {
+                // Небольшая задержка для каждой карты для создания эффекта последовательности
+                setTimeout(() => {
+                    card.classList.add('selected-highlight');
+                }, index * 150);
+            });
+            
+            // Через 1.5 секунды скрываем невыбранные карты
             setTimeout(() => {
-                // Удаляем невыбранные карты
                 notFlippedCards.forEach(card => {
-                    if (card.parentNode) {
-                        card.parentNode.removeChild(card);
-                    }
-                });
-                
-                // Применяем финальное состояние к выбранным картам
-                const flippedCards = document.querySelectorAll('.card.flipped');
-                flippedCards.forEach((card, index) => {
-                    // Убираем предыдущие анимации
-                    card.style.animation = 'none';
-                    
-                    // Добавляем задержку для каждой карты
-                    setTimeout(() => {
-                        card.classList.add('final-state');
-                    }, index * 100);
+                    card.style.display = 'none';
                 });
             }, 1500);
         }

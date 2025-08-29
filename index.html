@@ -41,58 +41,52 @@
             overflow: hidden;
         }
 
-        /* Луна-полумесяц */
-        .moon {
-            position: absolute;
-            width: 150px;
-            height: 150px;
-            top: 15%;
-            right: 10%;
-            animation: floatMoon 15s infinite alternate ease-in-out;
-        }
-
-        .moon::before {
-            content: "";
+        /* Северное сияние */
+        .aurora {
             position: absolute;
             width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 30% 30%, #f1c40f, #f39c12, #e67e22);
-            border-radius: 50%;
-            box-shadow: 0 0 30px rgba(241, 196, 15, 0.7);
+            height: 40%;
+            top: 0;
+            left: 0;
+            opacity: 0.6;
+            filter: blur(20px);
+            z-index: -1;
+            overflow: hidden;
         }
 
-        .moon::after {
+        .aurora::before, .aurora::after {
             content: "";
             position: absolute;
-            width: 80%;
-            height: 80%;
-            background: #0b0b2a;
-            border-radius: 50%;
-            top: 10%;
-            right: -20%;
+            width: 150%;
+            height: 100%;
+            animation: auroraFlow 20s infinite linear;
         }
 
-        @keyframes floatMoon {
-            0% { transform: translateY(0) rotate(0deg); }
-            100% { transform: translateY(-15px) rotate(3deg); }
+        .aurora::before {
+            background: linear-gradient(90deg, 
+                rgba(0, 255, 255, 0.2) 0%, 
+                rgba(0, 150, 255, 0.3) 25%, 
+                rgba(128, 0, 255, 0.4) 50%, 
+                rgba(255, 0, 150, 0.3) 75%, 
+                rgba(255, 100, 0, 0.2) 100%);
+            left: -25%;
+            animation-delay: -10s;
         }
 
-        /* Туманность */
-        .nebula-large {
-            position: absolute;
-            width: 300px;
-            height: 300px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(142, 68, 173, 0.3), transparent 70%);
-            filter: blur(30px);
-            bottom: 15%;
-            left: 10%;
-            animation: pulsateNebula 15s infinite alternate;
+        .aurora::after {
+            background: linear-gradient(90deg, 
+                rgba(255, 0, 150, 0.2) 0%, 
+                rgba(128, 0, 255, 0.3) 25%, 
+                rgba(0, 150, 255, 0.4) 50%, 
+                rgba(0, 255, 255, 0.3) 75%, 
+                rgba(0, 255, 0, 0.2) 100%);
+            left: -25%;
+            animation-delay: -5s;
         }
 
-        @keyframes pulsateNebula {
-            0% { opacity: 0.3; transform: scale(1); }
-            100% { opacity: 0.6; transform: scale(1.2); }
+        @keyframes auroraFlow {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(50%); }
         }
 
         .star {
@@ -105,21 +99,6 @@
         @keyframes twinkle {
             0%, 100% { opacity: 0.2; }
             50% { opacity: 1; }
-        }
-
-        .shooting-star {
-            position: absolute;
-            height: 2px;
-            background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 50%, rgba(255,255,255,0) 100%);
-            animation: shoot 5s infinite;
-            opacity: 0;
-        }
-
-        @keyframes shoot {
-            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); opacity: 0; }
-            1% { opacity: 1; }
-            10% { transform: translateX(100vw) translateY(100vh) rotate(45deg); opacity: 0; }
-            100% { opacity: 0; }
         }
 
         .container {
@@ -153,22 +132,16 @@
             width: 100%;
         }
 
-        /* Расположение карт: первые три в первом ряду, последние две по центру во втором ряду */
-        .card:nth-child(1) { grid-row: 1; grid-column: 1; }
-        .card:nth-child(2) { grid-row: 1; grid-column: 2; }
-        .card:nth-child(3) { grid-row: 1; grid-column: 3; }
-        .card:nth-child(4) { grid-row: 2; grid-column: 2; } /* Центр второго ряда */
-        .card:nth-child(5) { grid-row: 2; grid-column: 3; } /* Справа от центра */
-
         .card {
             position: relative;
             width: 100%;
             height: 0;
-            padding-bottom: 143.29%; /* 470/328 = 1.4329 соотношение сторон карты */
+            padding-bottom: 143.29%;
             perspective: 1000px;
             cursor: pointer;
             animation: fadeIn 0.5s ease-in-out, floating 3s ease-in-out infinite;
             animation-fill-mode: both;
+            transform: translateZ(0);
         }
 
         @keyframes floating {
@@ -181,6 +154,7 @@
         .card:nth-child(3) { animation-delay: 0.3s, 0.4s; }
         .card:nth-child(4) { animation-delay: 0.4s, 0.6s; }
         .card:nth-child(5) { animation-delay: 0.5s, 0.8s; }
+        .card:nth-child(6) { animation-delay: 0.6s, 1.0s; }
 
         @keyframes fadeIn {
             from {
@@ -195,14 +169,15 @@
 
         .card-inner {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 3px;
+            left: 3px;
+            width: calc(100% - 6px);
+            height: calc(100% - 6px);
             transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             transform-style: preserve-3d;
-            border-radius: 8px;
+            border-radius: 6px;
             will-change: transform;
+            transform: translateZ(0);
         }
 
         .card.flipped .card-inner {
@@ -225,18 +200,19 @@
             width: 100%;
             height: 100%;
             backface-visibility: hidden;
-            border-radius: 8px;
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
             overflow: hidden;
+            transform: translateZ(0);
         }
 
         .card-back {
-            background: url('card-back.png') center/contain no-repeat;
+            background: #2c1250 url('card-back.png') center/contain no-repeat;
             border: 2px solid transparent;
-            transition: border 0.3s;
+            transition: all 0.3s;
         }
 
         .card-front {
@@ -249,6 +225,14 @@
             border: 2px solid rgba(128, 0, 255, 0.5);
             flex-direction: column;
             justify-content: center;
+        }
+
+        /* Уменьшенное неоновое свечение для выбранной карты */
+        .card.flipped .card-front {
+            box-shadow: 0 0 10px 3px rgba(128, 0, 255, 0.5),
+                        0 0 15px 5px rgba(128, 0, 255, 0.3),
+                        0 0 20px 7px rgba(128, 0, 255, 0.2);
+            border: 2px solid rgba(180, 70, 255, 0.6);
         }
 
         .card-name {
@@ -264,7 +248,7 @@
             align-items: center;
             justify-content: center;
             width: 100%;
-            min-height: 80px; /* Фиксированная высота для предотвращения скачков */
+            min-height: 80px;
         }
 
         .selected-count {
@@ -310,24 +294,6 @@
             margin-top: 15px;
         }
 
-        .confirm-btn:before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            z-index: -1;
-            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 50%, #6a11cb 100%);
-            border-radius: 25px;
-            animation: borderGlow 2s infinite linear;
-        }
-
-        @keyframes borderGlow {
-            0% { filter: hue-rotate(0deg) blur(5px); }
-            100% { filter: hue-rotate(360deg) blur(5px); }
-        }
-
         .confirm-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
@@ -336,6 +302,46 @@
         .confirm-btn:not(:disabled):hover {
             transform: translateY(-3px);
             box-shadow: 0 7px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Анимация исчезновения невыбранных карт */
+        .card.exit {
+            animation: cardExit 1s ease forwards;
+        }
+
+        @keyframes cardExit {
+            0% {
+                opacity: 1;
+                transform: translateY(0) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-100px) rotate(-15deg);
+                visibility: hidden;
+            }
+        }
+
+        /* Анимация перемещения выбранных карт в ряд */
+        .cards-grid.final-state {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .cards-grid.final-state .card {
+            width: 30%;
+            padding-bottom: 42.87%;
+            animation: moveToRow 1s ease forwards;
+        }
+
+        @keyframes moveToRow {
+            0% {
+                transform: translate(0, 0);
+            }
+            100% {
+                transform: translate(0, 0);
+            }
         }
 
         /* Для мобильных устройств */
@@ -371,19 +377,13 @@
                 font-size: 14px;
             }
             
-            /* Луна и туманность для мобильных */
-            .moon {
-                width: 100px;
-                height: 100px;
-                top: 10%;
-                right: 5%;
+            .cards-grid.final-state {
+                gap: 10px;
             }
             
-            .nebula-large {
-                width: 200px;
-                height: 200px;
-                bottom: 10%;
-                left: 5%;
+            .cards-grid.final-state .card {
+                width: 28%;
+                padding-bottom: 40%;
             }
         }
 
@@ -400,19 +400,30 @@
                 font-size: 11px;
                 padding: 5px 8px;
             }
+
+            .cards-grid.final-state {
+                gap: 8px;
+            }
+            
+            .cards-grid.final-state .card {
+                width: 26%;
+                padding-bottom: 37%;
+            }
         }
     </style>
 </head>
 <body>
     <div class="space-background" id="spaceBackground">
-        <div class="moon"></div>
-        <div class="nebula-large"></div>
+        <div class="aurora"></div>
+        <!-- Звезды будут добавлены через JavaScript -->
     </div>
     
     <div class="container">
         <h1>Выберите 3 карты для расклада</h1>
         
-        <div class="cards-grid" id="cardsGrid"></div>
+        <div class="cards-grid" id="cardsGrid">
+            <!-- Карты будут добавлены через JavaScript -->
+        </div>
         
         <div class="selection-info">
             <div class="selected-count" id="selectedCount">Выбрано: 0/3 карт</div>
@@ -438,24 +449,6 @@
                 star.style.animationDelay = Math.random() * 5 + 's';
                 spaceBg.appendChild(star);
             }
-            
-            // Создаем падающие звезды
-            setInterval(() => {
-                const shootingStar = document.createElement('div');
-                shootingStar.className = 'shooting-star';
-                shootingStar.style.left = Math.random() * 20 + '%';
-                shootingStar.style.top = Math.random() * 20 + '%';
-                shootingStar.style.width = 50 + Math.random() * 80 + 'px';
-                shootingStar.style.animationDelay = Math.random() * 2 + 's';
-                spaceBg.appendChild(shootingStar);
-                
-                // Удаляем через 10 секунд
-                setTimeout(() => {
-                    if (spaceBg.contains(shootingStar)) {
-                        spaceBg.removeChild(shootingStar);
-                    }
-                }, 10000);
-            }, 3000);
         }
 
         const tg = window.Telegram.WebApp;
@@ -469,11 +462,11 @@
             "Дьявол", "Башня", "Звезда", "Луна", "Солнце", "Страшный суд", "Мир"
         ];
         
-        // Выбираем 5 случайных карт
+        // Выбираем 6 случайных карт
         const selectedCards = [];
         const usedIndexes = new Set();
         
-        while (selectedCards.length < 5) {
+        while (selectedCards.length < 6) {
             const randomIndex = Math.floor(Math.random() * allCards.length);
             if (!usedIndexes.has(randomIndex)) {
                 selectedCards.push(allCards[randomIndex]);
@@ -482,6 +475,7 @@
         }
         
         let userSelectedCards = [];
+        let isFinalState = false;
         
         // Создаем карты в интерфейсе
         const cardsGrid = document.getElementById('cardsGrid');
@@ -489,9 +483,17 @@
         const selectedCardsContainer = document.getElementById('selectedCardsContainer');
         const confirmBtn = document.getElementById('confirmBtn');
         
-        selectedCards.forEach((cardName, index) => {
+        // Создаем все 6 карт
+        for (let i = 0; i < 6; i++) {
+            const cardElement = createCardElement(selectedCards[i], i);
+            cardsGrid.appendChild(cardElement);
+        }
+        
+        // Функция создания элемента карты
+        function createCardElement(cardName, index) {
             const cardElement = document.createElement('div');
             cardElement.className = 'card';
+            cardElement.dataset.index = index;
             cardElement.innerHTML = `
                 <div class="card-inner">
                     <div class="card-back"></div>
@@ -504,6 +506,8 @@
             let isFlipped = false;
             
             cardElement.addEventListener('click', () => {
+                if (isFinalState) return;
+                
                 // Если карта уже перевернута, ничего не делаем
                 if (isFlipped) return;
                 
@@ -516,7 +520,11 @@
                 }
                 
                 // Добавляем карту в выбранные
-                userSelectedCards.push(cardName);
+                userSelectedCards.push({
+                    name: cardName,
+                    element: cardElement,
+                    index: index
+                });
                 cardElement.classList.add('flipped');
                 isFlipped = true;
                 
@@ -525,10 +533,47 @@
                 
                 // Активируем кнопку при выборе 3 карт
                 confirmBtn.disabled = userSelectedCards.length !== 3;
+                
+                // Если выбрано 3 карты, запускаем анимацию завершения
+                if (userSelectedCards.length === 3) {
+                    animateSelectionCompletion();
+                }
             });
             
-            cardsGrid.appendChild(cardElement);
-        });
+            return cardElement;
+        }
+        
+        // Функция анимации завершения выбора
+        function animateSelectionCompletion() {
+            isFinalState = true;
+            
+            // Находим все невыбранные карты
+            const allCards = document.querySelectorAll('.card');
+            const notFlippedCards = [];
+            
+            allCards.forEach(card => {
+                if (!card.classList.contains('flipped')) {
+                    notFlippedCards.push(card);
+                }
+            });
+            
+            // Анимируем исчезновение невыбранных карт
+            notFlippedCards.forEach(card => {
+                card.classList.add('exit');
+            });
+            
+            // После исчезновения невыбранных карт, выстраиваем выбранные в ряд
+            setTimeout(() => {
+                // Скрываем невыбранные карты
+                notFlippedCards.forEach(card => {
+                    card.style.display = 'none';
+                });
+                
+                // Выстраиваем выбранные карты в ряд
+                cardsGrid.classList.add('final-state');
+                
+            }, 1000);
+        }
         
         // Функция обновления информации о выбранных картах
         function updateSelectionInfo() {
@@ -541,7 +586,7 @@
                 userSelectedCards.forEach(card => {
                     const cardElement = document.createElement('div');
                     cardElement.className = 'selected-card-item';
-                    cardElement.textContent = card;
+                    cardElement.textContent = card.name;
                     selectedCardsContainer.appendChild(cardElement);
                 });
             }
@@ -555,7 +600,7 @@
             }
             
             // Отправляем выбранные карты обратно в бота
-            tg.sendData(JSON.stringify(userSelectedCards));
+            tg.sendData(JSON.stringify(userSelectedCards.map(card => card.name)));
             tg.close();
         });
 

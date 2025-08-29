@@ -434,14 +434,33 @@
 
         .card-front {
             background: linear-gradient(135deg, #1a1a40, #0b0b2a);
-            color: white;
             transform: rotateY(180deg);
-            padding: 8px;
-            font-weight: bold;
-            text-align: center;
+            padding: 0;
             border: 2px solid rgba(128, 0, 255, 0.5);
             flex-direction: column;
+            justify-content: flex-start;
+            overflow: hidden;
+        }
+
+        .card-image {
+            width: 100%;
+            height: 85%;
+            object-fit: cover;
+            border-radius: 4px 4px 0 0;
+        }
+
+        .card-name {
+            height: 15%;
+            display: flex;
+            align-items: center;
             justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+            background: rgba(0, 0, 0, 0.6);
+            width: 100%;
+            padding: 4px;
         }
 
         /* Уменьшенное неоновое свечение для выбранной карты */
@@ -450,12 +469,6 @@
                         0 0 15px 5px rgba(128, 0, 255, 0.3),
                         0 0 20px 7px rgba(128, 0, 255, 0.2);
             border: 2px solid rgba(180, 70, 255, 0.6);
-        }
-
-        .card-name {
-            font-size: 14px;
-            margin-top: 8px;
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
         }
 
         .selection-info {
@@ -555,7 +568,7 @@
             }
             
             .card-name {
-                font-size: 12px;
+                font-size: 10px;
             }
             
             .selected-count {
@@ -602,7 +615,8 @@
             }
             
             .card-name {
-                font-size: 11px;
+                font-size: 9px;
+                padding: 2px;
             }
             
             .selected-card-item {
@@ -689,12 +703,30 @@
         const tg = window.Telegram.WebApp;
         tg.expand();
         
-        // Список всех карт Таро
-        const allCards = [
-            "Шут", "Маг", "Верховная Жрица", "Императрица", "Император",
-            "Иерофант", "Влюбленные", "Колесница", "Сила", "Отшельник",
-            "Колесо Фортуны", "Правосудие", "Повешенный", "Смерть", "Умеренность",
-            "Дьявол", "Башня", "Звезда", "Луна", "Солнце", "Страшный суд", "Мир"
+        // Карты Таро с путями к изображениям
+        const tarotCards = [
+            { name: "Шут", image: "https://i.imgur.com/example1.jpg" },
+            { name: "Маг", image: "https://i.imgur.com/example2.jpg" },
+            { name: "Верховная Жрица", image: "https://i.imgur.com/example3.jpg" },
+            { name: "Императрица", image: "https://i.imgur.com/example4.jpg" },
+            { name: "Император", image: "https://i.imgur.com/example5.jpg" },
+            { name: "Иерофант", image: "https://i.imgur.com/example6.jpg" },
+            { name: "Влюбленные", image: "https://i.imgur.com/example7.jpg" },
+            { name: "Колесница", image: "https://i.imgur.com/example8.jpg" },
+            { name: "Сила", image: "https://i.imgur.com/example9.jpg" },
+            { name: "Отшельник", image: "https://i.imgur.com/example10.jpg" },
+            { name: "Колесо Фортуны", image: "https://i.imgur.com/example11.jpg" },
+            { name: "Правосудие", image: "https://i.imgur.com/example12.jpg" },
+            { name: "Повешенный", image: "https://i.imgur.com/example13.jpg" },
+            { name: "Смерть", image: "https://i.imgur.com/example14.jpg" },
+            { name: "Умеренность", image: "https://i.imgur.com/example15.jpg" },
+            { name: "Дьявол", image: "https://i.imgur.com/example16.jpg" },
+            { name: "Башня", image: "https://i.imgur.com/example17.jpg" },
+            { name: "Звезда", image: "https://i.imgur.com/example18.jpg" },
+            { name: "Луна", image: "https://i.imgur.com/example19.jpg" },
+            { name: "Солнце", image: "https://i.imgur.com/example20.jpg" },
+            { name: "Страшный суд", image: "https://i.imgur.com/example21.jpg" },
+            { name: "Мир", image: "https://i.imgur.com/example22.jpg" }
         ];
         
         // Выбираем 6 случайных карт
@@ -702,9 +734,9 @@
         const usedIndexes = new Set();
         
         while (selectedCards.length < 6) {
-            const randomIndex = Math.floor(Math.random() * allCards.length);
+            const randomIndex = Math.floor(Math.random() * tarotCards.length);
             if (!usedIndexes.has(randomIndex)) {
-                selectedCards.push(allCards[randomIndex]);
+                selectedCards.push(tarotCards[randomIndex]);
                 usedIndexes.add(randomIndex);
             }
         }
@@ -725,15 +757,16 @@
         }
         
         // Функция создания элемента карты
-        function createCardElement(cardName, index) {
+        function createCardElement(cardData, index) {
             const cardElement = document.createElement('div');
             cardElement.className = 'card';
-            cardElement.setAttribute('data-card-name', cardName);
+            cardElement.setAttribute('data-card-name', cardData.name);
             cardElement.innerHTML = `
                 <div class="card-inner">
                     <div class="card-back"></div>
                     <div class="card-front">
-                        <div class="card-name">${cardName}</div>
+                        <img src="${cardData.image}" alt="${cardData.name}" class="card-image">
+                        <div class="card-name">${cardData.name}</div>
                     </div>
                 </div>
             `;
@@ -756,7 +789,7 @@
                 }
                 
                 // Добавляем карту в выбранные
-                userSelectedCards.push(cardName);
+                userSelectedCards.push(cardData);
                 cardElement.classList.add('flipped');
                 isFlipped = true;
                 
@@ -787,7 +820,7 @@
                 userSelectedCards.forEach(card => {
                     const cardElement = document.createElement('div');
                     cardElement.className = 'selected-card-item';
-                    cardElement.textContent = card;
+                    cardElement.textContent = card.name;
                     selectedCardsContainer.appendChild(cardElement);
                 });
             }
@@ -801,7 +834,7 @@
                 const cardName = card.getAttribute('data-card-name');
                 
                 // Если карта не выбрана пользователем
-                if (!userSelectedCards.includes(cardName)) {
+                if (!userSelectedCards.some(selected => selected.name === cardName)) {
                     // Добавляем класс для анимации улетания
                     card.classList.add('fly-away');
                 }
@@ -816,7 +849,7 @@
             }
             
             // Отправляем выбранные карты обратно в бота
-            tg.sendData(JSON.stringify(userSelectedCards));
+            tg.sendData(JSON.stringify(userSelectedCards.map(card => card.name)));
             tg.close();
         });
 

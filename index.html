@@ -295,10 +295,9 @@
         }
 
         @keyframes shoot {
-            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); opacity: 0; }
-            1% { opacity: 1; }
-            10% { transform: translateX(100vw) translateY(100vh) rotate(45deg); opacity: 0; }
-            100% { opacity: 0; }
+            from { transform: translateX(-100%) translateY(-100%) rotate(45deg); opacity: 0; }
+            10% { opacity: 1; }
+            to { transform: translateX(100vw) translateY(100vh) rotate(45deg); opacity: 0; }
         }
 
         .container {

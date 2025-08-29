@@ -41,54 +41,6 @@
             overflow: hidden;
         }
 
-        /* Северное сияние */
-        .aurora {
-            position: absolute;
-            width: 100%;
-            height: 40%;
-            top: 0;
-            left: 0;
-            opacity: 0.6;
-            filter: blur(20px);
-            z-index: -1;
-            overflow: hidden;
-        }
-
-        .aurora::before, .aurora::after {
-            content: "";
-            position: absolute;
-            width: 150%;
-            height: 100%;
-            animation: auroraFlow 20s infinite linear;
-        }
-
-        .aurora::before {
-            background: linear-gradient(90deg, 
-                rgba(0, 255, 255, 0.2) 0%, 
-                rgba(0, 150, 255, 0.3) 25%, 
-                rgba(128, 0, 255, 0.4) 50%, 
-                rgba(255, 0, 150, 0.3) 75%, 
-                rgba(255, 100, 0, 0.2) 100%);
-            left: -25%;
-            animation-delay: -10s;
-        }
-
-        .aurora::after {
-            background: linear-gradient(90deg, 
-                rgba(255, 0, 150, 0.2) 0%, 
-                rgba(128, 0, 255, 0.3) 25%, 
-                rgba(0, 150, 255, 0.4) 50%, 
-                rgba(0, 255, 255, 0.3) 75%, 
-                rgba(0, 255, 0, 0.2) 100%);
-            left: -25%;
-            animation-delay: -5s;
-        }
-
-        @keyframes auroraFlow {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(50%); }
-        }
-
         .star {
             position: absolute;
             background-color: white;
@@ -143,7 +95,7 @@
             animation: fadeIn 0.5s ease-in-out, floating 3s ease-in-out infinite;
             animation-fill-mode: both;
             transform: translateZ(0);
-            transition: all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transition: transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
         @keyframes floating {
@@ -251,7 +203,6 @@
             justify-content: center;
             width: 100%;
             min-height: 80px;
-            transition: all 0.8s ease;
         }
 
         .selected-count {
@@ -320,22 +271,15 @@
             100% {
                 opacity: 0;
                 transform: translateY(-100px) rotate(-15deg);
-                visibility: hidden;
+                pointer-events: none;
             }
         }
 
         /* Анимация перемещения выбранных карт в ряд */
-        .cards-grid.rearranging {
-            display: flex;
-            justify-content: space-between;
-            transition: all 1s ease;
-        }
-
-        .cards-grid.rearranging .card {
-            position: static;
-            width: 30%;
-            padding-bottom: 42.87%;
+        .card.move-to-position {
+            position: absolute;
             transition: all 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 20;
         }
 
         /* Для мобильных устройств */
@@ -370,11 +314,6 @@
                 padding: 10px 20px;
                 font-size: 14px;
             }
-            
-            .cards-grid.rearranging .card {
-                width: 28%;
-                padding-bottom: 40%;
-            }
         }
 
         @media (max-width: 480px) {
@@ -390,17 +329,11 @@
                 font-size: 11px;
                 padding: 5px 8px;
             }
-
-            .cards-grid.rearranging .card {
-                width: 26%;
-                padding-bottom: 37%;
-            }
         }
     </style>
 </head>
 <body>
     <div class="space-background" id="spaceBackground">
-        <div class="aurora"></div>
         <!-- Звезды будут добавлены через JavaScript -->
     </div>
     
@@ -555,10 +488,41 @@
                     card.style.display = 'none';
                 });
                 
-                // Меняем grid на flex для выстраивания в ряд
-                cardsGrid.classList.add('rearranging');
+                // Выстраиваем выбранные карты в ряд
+                arrangeCardsInRow();
                 
             }, 1000);
+        }
+        
+        // Функция для выстраивания карт в ряд
+        function arrangeCardsInRow() {
+            const containerWidth = cardsGrid.offsetWidth;
+            const cardWidth = containerWidth / 3; // 3 карты в ряду
+            const cardHeight = cardWidth * 1.4329; // Сохраняем пропорции (143.29%)
+            
+            // Рассчитываем позиции для каждой карты
+            userSelectedCards.forEach((card, index) => {
+                const cardElement = card.element;
+                
+                // Сохраняем исходные размеры карты
+                cardElement.style.width = cardWidth + 'px';
+                cardElement.style.paddingBottom = '0';
+                cardElement.style.height = cardHeight + 'px';
+                
+                // Добавляем класс для анимации
+                cardElement.classList.add('move-to-position');
+                
+                // Рассчитываем новую позицию
+                const newPosition = index * cardWidth;
+                
+                // Устанавливаем позицию
+                cardElement.style.left = newPosition + 'px';
+                cardElement.style.top = '0';
+            });
+            
+            // Меняем контейнер на абсолютное позиционирование
+            cardsGrid.style.position = 'relative';
+            cardsGrid.style.height = cardHeight + 'px';
         }
         
         // Функция обновления информации о выбранных картах

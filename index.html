@@ -806,8 +806,20 @@
             
             debugLog("Отправляем данные через глубокую ссылку: " + dataToSend);
             
-            // Используем глубокую ссылку вместо sendData
-            window.location.href = `https://t.me/EliraStarBot?start=cards_${dataToSend}`;
+            // Используем метод Telegram WebApp для открытия ссылки
+            const deepLink = `https://t.me/EliraStarBot?start=cards_${dataToSend}`;
+            
+            if (isTelegramWebApp) {
+                // Используем метод Telegram для открытия ссылки
+                tg.openLink(deepLink);
+                // Закрываем веб-приложение
+                setTimeout(() => {
+                    tg.close();
+                }, 1000);
+            } else {
+                // Для отладки в браузере
+                window.location.href = deepLink;
+            }
         });
 
         // Создаем космический фон после загрузки страницы

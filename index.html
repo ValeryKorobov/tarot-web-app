@@ -806,19 +806,19 @@
             
             debugLog("Отправляем данные через глубокую ссылку: " + dataToSend);
             
-            // Используем метод Telegram WebApp для открытия ссылки
-            const deepLink = `https://t.me/EliraStarBot?start=cards_${dataToSend}`;
+            // Используем метод Telegram WebApp для открытия Telegram-ссылки
+            const deepLink = `tg://resolve?domain=EliraStarBot&start=cards_${dataToSend}`;
             
             if (isTelegramWebApp) {
-                // Используем метод Telegram для открытия ссылки
-                tg.openLink(deepLink);
+                // Используем метод Telegram для открытия Telegram-ссылки
+                tg.openTelegramLink(deepLink);
                 // Закрываем веб-приложение
                 setTimeout(() => {
                     tg.close();
                 }, 1000);
             } else {
                 // Для отладки в браузере
-                window.location.href = deepLink;
+                window.location.href = `https://t.me/EliraStarBot?start=cards_${dataToSend}`;
             }
         });
 

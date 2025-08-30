@@ -788,7 +788,7 @@
             });
         }
         
-        // В функции обработки подтверждения выбора:
+        // Обработка подтверждения выбора
         confirmBtn.addEventListener('click', () => {
             debugLog("Нажата кнопка подтверждения выбора");
             
@@ -800,27 +800,14 @@
                 return;
             }
             
-            // Отправляем выбранные карты обратно в бота
+            // Отправляем выбранные карты обратно в бота через глубокую ссылку
             const selectedCardNames = userSelectedCards.map(card => card.name);
-            const dataToSend = JSON.stringify(selectedCardNames);
+            const dataToSend = encodeURIComponent(JSON.stringify(selectedCardNames));
             
-            debugLog("Отправляем данные: " + dataToSend);
+            debugLog("Отправляем данные через глубокую ссылку: " + dataToSend);
             
-            try {
-                if (isTelegramWebApp) {
-                    debugLog("Вызываем tg.sendData()");
-                    tg.sendData(dataToSend);
-                    debugLog("Вызываем tg.close()");
-                    tg.close();
-                } else {
-                    // Режим отладки в браузере
-                    debugLog("Режим отладки: данные не отправлены в Telegram");
-                    alert("Режим отладки: данные: " + dataToSend);
-                }
-            } catch (error) {
-                debugLog("Ошибка при отправке данных: " + error.message);
-                alert("Ошибка: " + error.message);
-            }
+            // Используем глубокую ссылку вместо sendData
+            window.location.href = `https://t.me/EliraStarBot?start=cards_${dataToSend}`;
         });
 
         // Создаем космический фон после загрузки страницы

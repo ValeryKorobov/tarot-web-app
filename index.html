@@ -551,6 +551,30 @@
     </div>
 
     <script>
+        // Инициализация Telegram Web App
+        let tg = null;
+        
+        // Проверяем, доступен ли Telegram WebApp
+        if (window.Telegram && window.Telegram.WebApp) {
+            tg = window.Telegram.WebApp;
+            tg.expand();
+            tg.enableClosingConfirmation();
+        } else {
+            console.error("Telegram WebApp не доступен");
+            // Для отладки в браузере
+            tg = {
+                sendData: function(data) {
+                    console.log("Данные для отправки:", data);
+                    alert("Данные отправлены: " + data);
+                },
+                close: function() {
+                    console.log("WebApp закрыт");
+                },
+                enableClosingConfirmation: function() {},
+                expand: function() {}
+            };
+        }
+
         // Оптимизация: ограничиваем количество одновременно создаваемых элементов
         let starsCreated = 0;
         const maxStars = 80;
@@ -595,9 +619,6 @@
             }, 10000);
         }
 
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        
         // Карты Таро с путями к изображениям (относительные пути)
         const tarotCards = [
             { name: "Шут", image: "fool.png" },
@@ -742,9 +763,23 @@
                 navigator.vibrate(20);
             }
             
+            // Проверяем, что выбрано ровно 3 карты
+            if (userSelectedCards.length !== 3) {
+                alert("Пожалуйста, выберите ровно 3 карты");
+                return;
+            }
+            
             // Отправляем выбранные карты обратно в бота
-            tg.sendData(JSON.stringify(userSelectedCards.map(card => card.name)));
-            tg.close();
+            const selectedCardNames = userSelectedCards.map(card => card.name);
+            console.log("Отправляем данные:", selectedCardNames);
+            
+            try {
+                tg.sendData(JSON.stringify(selectedCardNames));
+                tg.close();
+            } catch (error) {
+                console.error("Ошибка при отправке данных:", error);
+                alert("Ошибка при отправке данных. Попробуйте еще раз.");
+            }
         });
 
         // Создаем космический фон после загрузки страницы

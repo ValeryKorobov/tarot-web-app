@@ -551,62 +551,6 @@
     </div>
 
     <script>
-        // Глобальные переменные для отладки
-        window.DEBUG = true;
-        
-        function debugLog(message) {
-            if (window.DEBUG) {
-                console.log('[DEBUG]', new Date().toISOString(), message);
-                
-                // Также показываем alert в режиме отладки
-                if (window.DEBUG && typeof alert === 'function') {
-                    alert('DEBUG: ' + message);
-                }
-            }
-        }
-        
-        // Проверяем, доступен ли Telegram WebApp
-        let tg = null;
-        let isTelegramWebApp = false;
-        
-        if (window.Telegram && window.Telegram.WebApp) {
-            tg = window.Telegram.WebApp;
-            isTelegramWebApp = true;
-            debugLog("Telegram WebApp обнаружен");
-            
-            // Инициализируем WebApp
-            tg.expand();
-            tg.enableClosingConfirmation();
-            
-            // Показываем версию WebApp для отладки
-            debugLog("Версия WebApp: " + tg.version);
-            debugLog("Платформа: " + tg.platform);
-        } else {
-            debugLog("Telegram WebApp не обнаружен - работаем в режиме отладки");
-            // Создаем заглушку для отладки
-            tg = {
-                sendData: function(data) {
-                    debugLog("sendData вызван: " + data);
-                    // Для отладки показываем данные
-                    if (window.DEBUG) {
-                        alert("Данные для отправки: " + data);
-                    }
-                },
-                close: function() {
-                    debugLog("WebApp закрыт");
-                    // Для отладки не закрываем окно
-                },
-                enableClosingConfirmation: function() {
-                    debugLog("Подтверждение закрытия включено");
-                },
-                expand: function() {
-                    debugLog("WebApp расширен");
-                },
-                version: "debug",
-                platform: "browser"
-            };
-        }
-
         // Оптимизация: ограничиваем количество одновременно создаваемых элементов
         let starsCreated = 0;
         const maxStars = 80;
@@ -651,6 +595,9 @@
             }, 10000);
         }
 
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        
         // Карты Таро с путями к изображениям (относительные пути)
         const tarotCards = [
             { name: "Шут", image: "fool.png" },
@@ -790,43 +737,18 @@
         
         // Обработка подтверждения выбора
         confirmBtn.addEventListener('click', () => {
-            debugLog("Нажата кнопка подтверждения выбора");
-            
-            // Проверяем, что выбрано ровно 3 карты
-            if (userSelectedCards.length !== 3) {
-                const msg = "Пожалуйста, выберите ровно 3 карты. Выбрано: " + userSelectedCards.length;
-                debugLog(msg);
-                alert(msg);
-                return;
+            // Вибрация при подтверждении
+            if (navigator.vibrate) {
+                navigator.vibrate(20);
             }
             
-            // Отправляем выбранные карты обратно в бота через глубокую ссылку
-            const selectedCardNames = userSelectedCards.map(card => card.name);
-            const dataToSend = encodeURIComponent(JSON.stringify(selectedCardNames));
-            
-            debugLog("Отправляем данные через глубокую ссылку: " + dataToSend);
-            
-            // Используем метод Telegram WebApp для открытия Telegram-ссылки
-            const deepLink = `tg://resolve?domain=EliraStarBot&start=cards_${dataToSend}`;
-            
-            if (isTelegramWebApp) {
-                // Используем метод Telegram для открытия Telegram-ссылки
-                tg.openTelegramLink(deepLink);
-                // Закрываем веб-приложение
-                setTimeout(() => {
-                    tg.close();
-                }, 1000);
-            } else {
-                // Для отладки в браузере
-                window.location.href = `https://t.me/EliraStarBot?start=cards_${dataToSend}`;
-            }
+            // Отправляем выбранные карты обратно в бота
+            tg.sendData(JSON.stringify(userSelectedCards.map(card => card.name)));
+            tg.close();
         });
 
         // Создаем космический фон после загрузки страницы
-        window.addEventListener('load', function() {
-            debugLog("Страница полностью загружена");
-            createSpaceBackground();
-        });
+        window.addEventListener('load', createSpaceBackground);
     </script>
 </body>
 </html>

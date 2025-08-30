@@ -551,27 +551,59 @@
     </div>
 
     <script>
-        // Инициализация Telegram Web App
-        let tg = null;
+        // Глобальные переменные для отладки
+        window.DEBUG = true;
+        
+        function debugLog(message) {
+            if (window.DEBUG) {
+                console.log('[DEBUG]', new Date().toISOString(), message);
+                
+                // Также показываем alert в режиме отладки
+                if (window.DEBUG && typeof alert === 'function') {
+                    alert('DEBUG: ' + message);
+                }
+            }
+        }
         
         // Проверяем, доступен ли Telegram WebApp
+        let tg = null;
+        let isTelegramWebApp = false;
+        
         if (window.Telegram && window.Telegram.WebApp) {
             tg = window.Telegram.WebApp;
+            isTelegramWebApp = true;
+            debugLog("Telegram WebApp обнаружен");
+            
+            // Инициализируем WebApp
             tg.expand();
             tg.enableClosingConfirmation();
+            
+            // Показываем версию WebApp для отладки
+            debugLog("Версия WebApp: " + tg.version);
+            debugLog("Платформа: " + tg.platform);
         } else {
-            console.error("Telegram WebApp не доступен");
-            // Для отладки в браузере
+            debugLog("Telegram WebApp не обнаружен - работаем в режиме отладки");
+            // Создаем заглушку для отладки
             tg = {
                 sendData: function(data) {
-                    console.log("Данные для отправки:", data);
-                    alert("Данные отправлены: " + data);
+                    debugLog("sendData вызван: " + data);
+                    // Для отладки показываем данные
+                    if (window.DEBUG) {
+                        alert("Данные для отправки: " + data);
+                    }
                 },
                 close: function() {
-                    console.log("WebApp закрыт");
+                    debugLog("WebApp закрыт");
+                    // Для отладки не закрываем окно
                 },
-                enableClosingConfirmation: function() {},
-                expand: function() {}
+                enableClosingConfirmation: function() {
+                    debugLog("Подтверждение закрытия включено");
+                },
+                expand: function() {
+                    debugLog("WebApp расширен");
+                },
+                version: "debug",
+                platform: "browser"
             };
         }
 
@@ -756,34 +788,46 @@
             });
         }
         
-        // Обработка подтверждения выбора
+        // В функции обработки подтверждения выбора:
         confirmBtn.addEventListener('click', () => {
-            // Вибрация при подтверждении
-            if (navigator.vibrate) {
-                navigator.vibrate(20);
-            }
+            debugLog("Нажата кнопка подтверждения выбора");
             
             // Проверяем, что выбрано ровно 3 карты
             if (userSelectedCards.length !== 3) {
-                alert("Пожалуйста, выберите ровно 3 карты");
+                const msg = "Пожалуйста, выберите ровно 3 карты. Выбрано: " + userSelectedCards.length;
+                debugLog(msg);
+                alert(msg);
                 return;
             }
             
             // Отправляем выбранные карты обратно в бота
             const selectedCardNames = userSelectedCards.map(card => card.name);
-            console.log("Отправляем данные:", selectedCardNames);
+            const dataToSend = JSON.stringify(selectedCardNames);
+            
+            debugLog("Отправляем данные: " + dataToSend);
             
             try {
-                tg.sendData(JSON.stringify(selectedCardNames));
-                tg.close();
+                if (isTelegramWebApp) {
+                    debugLog("Вызываем tg.sendData()");
+                    tg.sendData(dataToSend);
+                    debugLog("Вызываем tg.close()");
+                    tg.close();
+                } else {
+                    // Режим отладки в браузере
+                    debugLog("Режим отладки: данные не отправлены в Telegram");
+                    alert("Режим отладки: данные: " + dataToSend);
+                }
             } catch (error) {
-                console.error("Ошибка при отправке данных:", error);
-                alert("Ошибка при отправке данных. Попробуйте еще раз.");
+                debugLog("Ошибка при отправке данных: " + error.message);
+                alert("Ошибка: " + error.message);
             }
         });
 
         // Создаем космический фон после загрузки страницы
-        window.addEventListener('load', createSpaceBackground);
+        window.addEventListener('load', function() {
+            debugLog("Страница полностью загружена");
+            createSpaceBackground();
+        });
     </script>
 </body>
 </html>
